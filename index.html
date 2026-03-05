@@ -33,10 +33,10 @@
 
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;overflow:hidden;}
-body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);position:relative;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);position:relative;font-size:16px;}
 
 /* ─── SCREENS ─── */
-.screen{display:none;position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
+.screen{display:none;position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:calc(80px + env(safe-area-inset-bottom));}
 .screen.active{display:flex;flex-direction:column;}
 
 /* ─── TOAST ─── */
@@ -67,7 +67,6 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);positi
 ═══════════════════════════════════ */
 #screen-home{
   background:radial-gradient(ellipse 100% 50% at 50% -5%,#0a2040 0%,transparent 65%),var(--bg);
-  padding-bottom:32px;
 }
 
 .home-top{
@@ -75,12 +74,12 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);positi
   position:relative;
 }
 .home-greeting{
-  font-size:13px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;
+  font-size:15px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;
   margin-bottom:4px;
 }
 .home-title{
   font-family:'Playfair Display',serif;
-  font-size:clamp(28px,7vw,40px);line-height:1.1;color:var(--text);
+  font-size:clamp(32px,8vw,46px);line-height:1.1;color:var(--text);
 }
 .home-title span{color:var(--accent);font-style:italic;}
 
@@ -93,10 +92,10 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);positi
   border-radius:14px;padding:12px 14px;
   display:flex;align-items:center;gap:10px;
 }
-.hud-icon{font-size:20px;}
+.hud-icon{font-size:22px;}
 .hud-info{}
-.hud-val{font-size:17px;font-weight:700;color:var(--text);}
-.hud-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;}
+.hud-val{font-size:19px;font-weight:700;color:var(--text);}
+.hud-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;}
 
 /* Level bar */
 .level-bar-wrap{
@@ -158,8 +157,8 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);positi
   font-size:20px;flex-shrink:0;
 }
 .sr-info{flex:1;min-width:0;}
-.sr-name{font-size:15px;font-weight:600;color:var(--text);}
-.sr-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.sr-name{font-size:16px;font-weight:600;color:var(--text);}
+.sr-sub{font-size:13px;color:var(--muted);margin-top:2px;}
 .sr-progress{
   display:flex;flex-direction:column;align-items:flex-end;gap:4px;
 }
@@ -186,7 +185,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);positi
 }
 .config-title{font-family:'Playfair Display',serif;font-size:24px;color:var(--text);}
 
-.config-body{padding:0 20px 120px;display:flex;flex-direction:column;gap:20px;}
+.config-body{padding:0 20px 160px;display:flex;flex-direction:column;gap:20px;}
 
 .cfg-section{}
 .cfg-label{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:10px;}
@@ -259,7 +258,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);positi
 /* ═══════════════════════════════════
    QUIZ SCREEN
 ═══════════════════════════════════ */
-#screen-quiz{background:var(--bg);}
+#screen-quiz{background:var(--bg);padding-bottom:0!important;}
 
 .quiz-bar{
   display:flex;align-items:center;gap:12px;
@@ -285,7 +284,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);positi
 .heart{font-size:18px;transition:all 0.3s;}
 .heart.lost{filter:grayscale(1);opacity:0.3;}
 
-.quiz-body{padding:20px 20px 120px;flex:1;}
+.quiz-body{padding:20px 20px 160px;flex:1;}
 
 /* Question number */
 .q-num{
@@ -306,8 +305,8 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);positi
 /* Question text */
 .q-text{
   font-family:'Playfair Display',serif;
-  font-size:clamp(17px,4.5vw,21px);
-  line-height:1.6;color:var(--text);
+  font-size:clamp(19px,5vw,24px);
+  line-height:1.65;color:var(--text);
   margin-bottom:24px;
 }
 
@@ -315,12 +314,12 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);positi
 .options{display:flex;flex-direction:column;gap:10px;}
 .opt{
   background:var(--card);border:1.5px solid var(--border);
-  border-radius:16px;padding:16px 18px;
+  border-radius:16px;padding:18px 18px;
   display:flex;align-items:flex-start;gap:14px;
   cursor:pointer;transition:all 0.18s;
   text-align:left;width:100%;
-  font-family:'Sora',sans-serif;font-size:15px;
-  color:var(--text);line-height:1.5;
+  font-family:'Sora',sans-serif;font-size:16px;
+  color:var(--text);line-height:1.55;
 }
 .opt:not(:disabled):active{transform:scale(0.98);}
 .opt:not(:disabled):hover{border-color:var(--border2);}
@@ -382,6 +381,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);positi
   align-items:center;
   padding:48px 20px 40px;
   gap:0;
+  padding-bottom:0!important;
 }
 .result-emoji{font-size:72px;text-align:center;margin-bottom:12px;animation:bounceIn 0.5s cubic-bezier(.34,1.56,.64,1);}
 @keyframes bounceIn{from{transform:scale(0);}to{transform:scale(1);}}
@@ -457,8 +457,8 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);positi
   border-radius:16px;padding:16px;
 }
 .ssi-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
-.ssi-name{font-size:14px;font-weight:600;color:var(--text);}
-.ssi-pct{font-size:14px;font-weight:700;}
+.ssi-name{font-size:15px;font-weight:600;color:var(--text);}
+.ssi-pct{font-size:15px;font-weight:700;}
 .ssi-bar{height:8px;background:var(--s1);border-radius:100px;overflow:hidden;}
 .ssi-fill{height:100%;border-radius:100px;transition:width 0.8s cubic-bezier(.34,1.56,.64,1);}
 .ssi-meta{display:flex;justify-content:space-between;margin-top:6px;}
@@ -479,11 +479,11 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);positi
 .admin-body{padding:0 20px 60px;display:flex;flex-direction:column;gap:14px;}
 
 .form-group{display:flex;flex-direction:column;gap:6px;}
-.form-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;}
+.form-label{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;}
 .form-input{
   background:var(--s2);border:1.5px solid var(--border);
-  border-radius:12px;padding:14px 16px;
-  font-size:15px;color:var(--text);
+  border-radius:12px;padding:16px 16px;
+  font-size:16px;color:var(--text);
   font-family:'Sora',sans-serif;
   outline:none;transition:border-color 0.15s;
   width:100%;
@@ -524,8 +524,9 @@ select.form-input{cursor:pointer;}
   position:fixed;bottom:0;left:0;right:0;
   background:var(--s1);border-top:1px solid var(--border);
   display:flex;
-  padding-bottom:env(safe-area-inset-bottom);
+  padding-bottom:max(env(safe-area-inset-bottom), 8px);
   z-index:200;
+  min-height:64px;
 }
 .nav-item{
   flex:1;display:flex;flex-direction:column;align-items:center;
@@ -535,8 +536,8 @@ select.form-input{cursor:pointer;}
   font-family:'Sora',sans-serif;
 }
 .nav-item.active{color:var(--accent);}
-.nav-icon{font-size:22px;margin-bottom:3px;}
-.nav-lbl{font-size:10px;font-weight:600;letter-spacing:0.04em;}
+.nav-icon{font-size:24px;margin-bottom:3px;}
+.nav-lbl{font-size:11px;font-weight:600;letter-spacing:0.04em;}
 
 /* ─── LOADING ─── */
 #loading{
@@ -577,7 +578,7 @@ select.form-input{cursor:pointer;}
 ══════════════════════════════════ -->
 <div class="screen" id="screen-home">
   <div class="home-top">
-    <div class="home-greeting">¡Bienvenido, Dr. Ruiz!</div>
+    <div class="home-greeting">¡Bienvenido, Dr. Michael!</div>
     <h1 class="home-title">Domina tu<br><span>Residencia</span></h1>
   </div>
 
