@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,826 +8,536 @@
 <meta name="apple-mobile-web-app-title" content="MedRes">
 <meta name="theme-color" content="#080b11">
 <title>MedRes · Residencias UNAL</title>
-<link rel="manifest" href="data:application/json,{%22name%22:%22MedRes%22,%22short_name%22:%22MedRes%22,%22display%22:%22standalone%22,%22background_color%22:%22%23080b11%22,%22theme_color%22:%22%23080b11%22}">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
 <style>
+/* ══════════════════════════════════════
+   TOKENS — DARK & LIGHT
+══════════════════════════════════════ */
 :root {
-  --bg:       #080b11;
-  --s1:       #0d1220;
-  --s2:       #121929;
-  --card:     #161e2e;
-  --border:   #1e2d45;
-  --border2:  #243450;
-  --accent:   #00d4aa;
-  --accent2:  #0099ff;
-  --gold:     #ffd700;
-  --xp:       #ff6b35;
-  --correct:  #00c896;
-  --wrong:    #ff4757;
-  --warn:     #ffa502;
-  --text:     #e8f0ff;
-  --muted:    #5a7299;
-  --muted2:   #3d5475;
-  --heart:    #ff4757;
+  --bg:#080b11; --s1:#0d1220; --s2:#121929; --card:#161e2e;
+  --border:#1e2d45; --border2:#243450;
+  --accent:#00d4aa; --accent2:#0099ff;
+  --correct:#00c896; --wrong:#ff4757; --warn:#ffa502;
+  --xp:#ff6b35; --gold:#ffd700;
+  --text:#e8f0ff; --text2:#b0c4de; --muted:#5a7299; --muted2:#3d5475;
+  --nav-h:64px;
+  --shadow:0 4px 24px rgba(0,0,0,.4);
 }
-
+[data-theme="light"] {
+  --bg:#f0f4ff; --s1:#e4eaf8; --s2:#dae2f5; --card:#ffffff;
+  --border:#c8d4ee; --border2:#b0c0e0;
+  --text:#0d1a33; --text2:#2d4070; --muted:#6070a0; --muted2:#90a0c0;
+  --shadow:0 4px 24px rgba(0,0,80,.1);
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;overflow:hidden;}
-body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);position:relative;font-size:16px;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);font-size:16px;transition:background .25s,color .25s;}
 
-/* ─── SCREENS ─── */
-.screen{display:none;position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:calc(100px + env(safe-area-inset-bottom));}
+/* SCREENS */
+.screen{display:none;position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:calc(var(--nav-h) + 32px + env(safe-area-inset-bottom));}
 .screen.active{display:flex;flex-direction:column;}
+#screen-quiz,#screen-sim{padding-bottom:0!important;}
 
-/* ─── TOAST ─── */
-#toast{
-  position:fixed;top:24px;left:50%;transform:translateX(-50%) translateY(-80px);
-  background:var(--card);border:1px solid var(--border2);
-  border-radius:100px;padding:10px 20px;
-  font-size:13px;font-weight:600;color:var(--text);
-  z-index:9999;transition:transform 0.3s cubic-bezier(.34,1.56,.64,1);
-  white-space:nowrap;pointer-events:none;
-}
+/* TOAST */
+#toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-90px);background:var(--card);border:1px solid var(--border2);border-radius:100px;padding:10px 20px;font-size:13px;font-weight:600;color:var(--text);z-index:9999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;pointer-events:none;box-shadow:var(--shadow);}
 #toast.show{transform:translateX(-50%) translateY(0);}
 
-/* ─── XP POPUP ─── */
-.xp-popup{
-  position:fixed;pointer-events:none;z-index:9998;
-  font-family:'Playfair Display',serif;font-size:22px;font-weight:700;
-  color:var(--accent);text-shadow:0 0 20px rgba(0,212,170,0.5);
-  animation:xpFloat 1.2s ease forwards;
-}
-@keyframes xpFloat{
-  0%{opacity:1;transform:translateY(0) scale(1);}
-  100%{opacity:0;transform:translateY(-60px) scale(1.3);}
-}
+/* XP POPUP */
+.xp-popup{position:fixed;pointer-events:none;z-index:9998;font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--accent);text-shadow:0 0 20px rgba(0,212,170,.5);animation:xpFloat 1.2s ease forwards;}
+@keyframes xpFloat{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-60px) scale(1.3);}}
 
-/* ═══════════════════════════════════
-   HOME SCREEN
-═══════════════════════════════════ */
-#screen-home{
-  background:radial-gradient(ellipse 100% 50% at 50% -5%,#0a2040 0%,transparent 65%),var(--bg);
+/* ══ TOP BAR (shared) ══ */
+.top-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:52px 20px 16px;
 }
+.top-bar-title{font-family:'Playfair Display',serif;font-size:26px;color:var(--text);}
+.theme-toggle{
+  width:44px;height:44px;border-radius:14px;
+  background:var(--s2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;cursor:pointer;flex-shrink:0;
+  transition:background .15s,transform .15s;
+}
+.theme-toggle:active{transform:scale(.9);}
 
-.home-top{
-  padding:56px 20px 24px;
-  position:relative;
-}
-.home-greeting{
-  font-size:15px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;
-  margin-bottom:4px;
-}
-.home-title{
-  font-family:'Playfair Display',serif;
-  font-size:clamp(32px,8vw,46px);line-height:1.1;color:var(--text);
-}
+/* ══ HOME ══ */
+#screen-home{background:radial-gradient(ellipse 100% 50% at 50% -5%,#0a2040,transparent 65%),var(--bg);}
+[data-theme="light"] #screen-home{background:radial-gradient(ellipse 100% 50% at 50% -5%,#c8d8f8,transparent 65%),var(--bg);}
+.home-top{padding:52px 20px 16px;display:flex;align-items:flex-start;justify-content:space-between;}
+.home-greeting{font-size:14px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;}
+.home-title{font-family:'Playfair Display',serif;font-size:clamp(28px,7vw,42px);line-height:1.1;color:var(--text);}
 .home-title span{color:var(--accent);font-style:italic;}
 
-/* Streak + XP bar */
-.hud-row{
-  display:flex;gap:10px;margin:20px 20px 0;
-}
-.hud-pill{
-  flex:1;background:var(--s2);border:1px solid var(--border);
-  border-radius:14px;padding:12px 14px;
-  display:flex;align-items:center;gap:10px;
-}
-.hud-icon{font-size:22px;}
-.hud-info{}
-.hud-val{font-size:19px;font-weight:700;color:var(--text);}
-.hud-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;}
+.hud-row{display:flex;gap:10px;margin:0 20px;}
+.hud-pill{flex:1;background:var(--s2);border:1px solid var(--border);border-radius:14px;padding:12px 10px;display:flex;align-items:center;gap:8px;}
+.hud-icon{font-size:20px;}
+.hud-val{font-size:17px;font-weight:700;color:var(--text);}
+.hud-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
 
-/* Level bar */
-.level-bar-wrap{
-  margin:16px 20px 0;
-  background:var(--s2);border:1px solid var(--border);
-  border-radius:14px;padding:14px 16px;
-}
+.level-bar-wrap{margin:12px 20px 0;background:var(--s2);border:1px solid var(--border);border-radius:14px;padding:14px 16px;}
 .level-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
 .level-txt{font-size:13px;font-weight:600;color:var(--text);}
 .level-xp{font-size:12px;color:var(--muted);}
 .level-track{height:8px;background:var(--s1);border-radius:100px;overflow:hidden;}
-.level-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:100px;transition:width 0.6s cubic-bezier(.34,1.56,.64,1);}
+.level-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:100px;transition:width .6s cubic-bezier(.34,1.56,.64,1);}
 
-/* Quick play */
-.section-hdr{
-  padding:24px 20px 10px;
-  font-size:11px;letter-spacing:0.1em;text-transform:uppercase;
-  color:var(--muted);font-weight:600;
+/* Review today banner */
+.review-banner{
+  margin:12px 20px 0;
+  background:linear-gradient(135deg,rgba(0,212,170,.12),rgba(0,153,255,.08));
+  border:1px solid rgba(0,212,170,.3);
+  border-radius:16px;padding:14px 16px;
+  display:flex;align-items:center;gap:14px;
+  cursor:pointer;transition:all .18s;
 }
-.quick-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:10px;
-  padding:0 20px;
-}
-.quick-card{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:18px;padding:18px 16px;
-  cursor:pointer;transition:all 0.18s;
-  position:relative;overflow:hidden;
-}
-.quick-card::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(0,212,170,0.06),transparent);
-  opacity:0;transition:opacity 0.2s;
-}
-.quick-card:active{transform:scale(0.96);}
-.quick-card:active::before{opacity:1;}
+.review-banner:active{transform:scale(.98);}
+.rb-icon{font-size:28px;}
+.rb-info{flex:1;}
+.rb-title{font-size:15px;font-weight:700;color:var(--text);}
+.rb-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.rb-count{background:var(--accent);color:#000;border-radius:20px;padding:5px 12px;font-size:13px;font-weight:700;}
+
+.section-hdr{padding:18px 20px 10px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;}
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 20px;}
+.quick-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px 16px;cursor:pointer;transition:all .18s;position:relative;overflow:hidden;box-shadow:var(--shadow);}
+.quick-card:active{transform:scale(.96);}
 .qc-icon{font-size:28px;margin-bottom:10px;}
 .qc-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;}
 .qc-desc{font-size:11px;color:var(--muted);}
-.qc-badge{
-  position:absolute;top:12px;right:12px;
-  background:var(--accent);color:#000;
-  border-radius:20px;padding:3px 8px;
-  font-size:10px;font-weight:700;
-}
+.qc-badge{position:absolute;top:12px;right:12px;background:var(--accent);color:#000;border-radius:20px;padding:3px 8px;font-size:10px;font-weight:700;}
 
-/* Specialty list */
 .spec-list{display:flex;flex-direction:column;gap:8px;padding:0 20px;}
-.spec-row{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:16px;padding:14px 16px;
-  display:flex;align-items:center;gap:14px;
-  cursor:pointer;transition:all 0.18s;
-}
-.spec-row:active{transform:scale(0.98);background:var(--s2);}
-.sr-icon{
-  width:44px;height:44px;border-radius:13px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:20px;flex-shrink:0;
-}
+.spec-row{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .18s;box-shadow:var(--shadow);}
+.spec-row:active{transform:scale(.98);}
+.sr-icon{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
 .sr-info{flex:1;min-width:0;}
-.sr-name{font-size:16px;font-weight:600;color:var(--text);}
-.sr-sub{font-size:13px;color:var(--muted);margin-top:2px;}
-.sr-progress{
-  display:flex;flex-direction:column;align-items:flex-end;gap:4px;
-}
+.sr-name{font-size:15px;font-weight:600;color:var(--text);}
+.sr-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.sr-progress{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
 .sr-pct{font-size:13px;font-weight:700;}
 .sr-bar{width:48px;height:4px;background:var(--s1);border-radius:100px;overflow:hidden;}
-.sr-fill{height:100%;border-radius:100px;transition:width 0.5s;}
+.sr-fill{height:100%;border-radius:100px;transition:width .5s;}
+.weak-badge{background:rgba(255,71,87,.12);border:1px solid rgba(255,71,87,.3);border-radius:6px;padding:2px 7px;font-size:10px;font-weight:700;color:var(--wrong);}
+.done-badge{background:rgba(0,200,150,.12);border:1px solid rgba(0,200,150,.3);border-radius:6px;padding:2px 7px;font-size:10px;font-weight:700;color:var(--correct);}
 
-/* ═══════════════════════════════════
-   EXAM CONFIG SCREEN
-═══════════════════════════════════ */
-#screen-config{
-  background:var(--bg);
-}
-.config-header{
-  padding:56px 20px 20px;
-  display:flex;align-items:center;gap:14px;
-}
-.btn-back{
-  width:40px;height:40px;border-radius:12px;
-  background:var(--s2);border:1px solid var(--border);
-  color:var(--text);font-size:20px;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;flex-shrink:0;
-}
-.config-title{font-family:'Playfair Display',serif;font-size:24px;color:var(--text);}
-
-.config-body{padding:0 20px 160px;display:flex;flex-direction:column;gap:20px;}
-
-.cfg-section{}
-.cfg-label{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:10px;}
-
-/* Question count pills */
+/* ══ CONFIG ══ */
+#screen-config{background:var(--bg);}
+.config-header{padding:52px 20px 16px;display:flex;align-items:center;gap:14px;}
+.btn-back{width:40px;height:40px;border-radius:12px;background:var(--s2);border:1px solid var(--border);color:var(--text);font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+.config-title{font-family:'Playfair Display',serif;font-size:22px;color:var(--text);}
+.config-body{padding:0 20px;display:flex;flex-direction:column;gap:18px;}
+.cfg-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
 .count-pills{display:flex;gap:8px;flex-wrap:wrap;}
-.count-pill{
-  background:var(--s2);border:1.5px solid var(--border);
-  border-radius:100px;padding:10px 20px;
-  font-size:15px;font-weight:600;color:var(--muted);
-  cursor:pointer;transition:all 0.15s;
-}
-.count-pill.active{
-  background:rgba(0,212,170,0.12);
-  border-color:var(--accent);color:var(--accent);
-}
-
-/* Mode cards */
+.count-pill{background:var(--s2);border:1.5px solid var(--border);border-radius:100px;padding:10px 20px;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;}
+.count-pill.active{background:rgba(0,212,170,.12);border-color:var(--accent);color:var(--accent);}
 .mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.mode-card{
-  background:var(--s2);border:1.5px solid var(--border);
-  border-radius:16px;padding:16px;
-  cursor:pointer;transition:all 0.15s;text-align:center;
-}
-.mode-card.active{background:rgba(0,212,170,0.08);border-color:var(--accent);}
-.mode-icon{font-size:26px;margin-bottom:8px;}
+.mode-card{background:var(--s2);border:1.5px solid var(--border);border-radius:16px;padding:16px;cursor:pointer;transition:all .15s;text-align:center;}
+.mode-card.active{background:rgba(0,212,170,.08);border-color:var(--accent);}
+.mode-icon{font-size:24px;margin-bottom:8px;}
 .mode-title{font-size:13px;font-weight:700;color:var(--text);}
 .mode-desc{font-size:11px;color:var(--muted);margin-top:3px;}
-
-/* Specialty checkboxes */
 .spec-check-list{display:flex;flex-direction:column;gap:8px;}
-.spec-check{
-  background:var(--s2);border:1.5px solid var(--border);
-  border-radius:14px;padding:14px 16px;
-  display:flex;align-items:center;gap:12px;
-  cursor:pointer;transition:all 0.15s;
-}
-.spec-check.active{background:rgba(0,212,170,0.08);border-color:var(--accent);}
-.sc-checkbox{
-  width:22px;height:22px;border-radius:7px;
-  border:2px solid var(--border2);
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;transition:all 0.15s;font-size:12px;
-}
+.spec-check{background:var(--s2);border:1.5px solid var(--border);border-radius:14px;padding:13px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s;}
+.spec-check.active{background:rgba(0,212,170,.08);border-color:var(--accent);}
+.sc-checkbox{width:22px;height:22px;border-radius:7px;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;transition:all .15s;}
 .spec-check.active .sc-checkbox{background:var(--accent);border-color:var(--accent);color:#000;}
 .sc-label{font-size:14px;font-weight:500;color:var(--text);}
 .sc-n{font-size:12px;color:var(--muted);margin-left:auto;}
+.select-all-btn{background:none;border:1px solid var(--border2);border-radius:100px;padding:6px 14px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;font-family:'Sora',sans-serif;white-space:nowrap;}
+.btn-start-exam{margin:20px 0 0;width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;border:none;border-radius:18px;padding:20px;font-size:17px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;box-shadow:0 8px 32px rgba(0,212,170,.3);}
+.btn-start-exam:active{transform:scale(.97);}
 
-.select-all-btn{
-  background:none;border:1px solid var(--border2);
-  border-radius:100px;padding:8px 16px;
-  font-size:12px;font-weight:600;color:var(--muted);
-  cursor:pointer;font-family:'Sora',sans-serif;
-  margin-bottom:8px;
-}
-
-/* Start button */
-.btn-start-exam{
-  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
-  width:calc(100% - 40px);max-width:400px;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  color:#000;border:none;border-radius:18px;
-  padding:20px;font-size:17px;font-weight:700;
-  cursor:pointer;font-family:'Sora',sans-serif;
-  box-shadow:0 8px 32px rgba(0,212,170,0.3);
-  z-index:100;
-}
-.btn-start-exam:active{transform:translateX(-50%) scale(0.97);}
-
-/* ═══════════════════════════════════
-   QUIZ SCREEN
-═══════════════════════════════════ */
-#screen-quiz{background:var(--bg);padding-bottom:0!important;}
-
-.quiz-bar{
-  display:flex;align-items:center;gap:12px;
-  padding:16px 20px;
-  background:var(--s1);border-bottom:1px solid var(--border);
-  position:sticky;top:0;z-index:50;
-}
-.quiz-close{
-  width:36px;height:36px;border-radius:10px;
-  background:var(--s2);border:1px solid var(--border);
-  color:var(--muted);font-size:16px;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;
-}
-.quiz-progress-wrap{
-  flex:1;height:8px;background:var(--s2);border-radius:100px;overflow:hidden;
-}
-.quiz-progress-fill{
-  height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));
-  border-radius:100px;transition:width 0.5s cubic-bezier(.34,1.56,.64,1);
-}
-.hearts{display:flex;gap:4px;}
-.heart{font-size:18px;transition:all 0.3s;}
-.heart.lost{filter:grayscale(1);opacity:0.3;}
-
+/* ══ QUIZ ══ */
+.quiz-bar{display:flex;align-items:center;gap:12px;padding:16px 20px;background:var(--s1);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;}
+.quiz-close{width:36px;height:36px;border-radius:10px;background:var(--s2);border:1px solid var(--border);color:var(--muted);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.quiz-progress-wrap{flex:1;height:8px;background:var(--s2);border-radius:100px;overflow:hidden;}
+.quiz-progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:100px;transition:width .5s cubic-bezier(.34,1.56,.64,1);}
+.hearts{display:flex;gap:3px;}
+.heart{font-size:17px;transition:all .3s;}
+.heart.lost{filter:grayscale(1);opacity:.3;}
 .quiz-body{padding:20px 20px 160px;flex:1;}
-
-/* Question number */
-.q-num{
-  font-size:12px;color:var(--muted);font-weight:600;
-  letter-spacing:0.06em;text-transform:uppercase;
-  margin-bottom:6px;
-}
-/* Specialty tag */
-.q-spec-tag{
-  display:inline-flex;align-items:center;gap:6px;
-  background:var(--s2);border:1px solid var(--border2);
-  border-radius:8px;padding:5px 10px;
-  font-size:11px;font-weight:600;color:var(--accent2);
-  text-transform:uppercase;letter-spacing:0.05em;
-  margin-bottom:16px;
-}
-
-/* Question text */
-.q-text{
-  font-family:'Playfair Display',serif;
-  font-size:clamp(19px,5vw,24px);
-  line-height:1.65;color:var(--text);
-  margin-bottom:24px;
-}
-
-/* Options */
+.q-num{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;}
+.q-spec-tag{display:inline-flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;color:var(--accent2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px;}
+.q-text{font-family:'Playfair Display',serif;font-size:clamp(18px,4.5vw,23px);line-height:1.65;color:var(--text);margin-bottom:20px;}
 .options{display:flex;flex-direction:column;gap:10px;}
-.opt{
-  background:var(--card);border:1.5px solid var(--border);
-  border-radius:16px;padding:18px 18px;
-  display:flex;align-items:flex-start;gap:14px;
-  cursor:pointer;transition:all 0.18s;
-  text-align:left;width:100%;
-  font-family:'Sora',sans-serif;font-size:16px;
-  color:var(--text);line-height:1.55;
-}
-.opt:not(:disabled):active{transform:scale(0.98);}
+.opt{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:17px 18px;display:flex;align-items:flex-start;gap:14px;cursor:pointer;transition:all .18s;text-align:left;width:100%;font-family:'Sora',sans-serif;font-size:16px;color:var(--text);line-height:1.5;}
+.opt:not(:disabled):active{transform:scale(.98);}
 .opt:not(:disabled):hover{border-color:var(--border2);}
-.opt-letter{
-  width:30px;height:30px;flex-shrink:0;border-radius:9px;
-  background:var(--s2);
-  display:flex;align-items:center;justify-content:center;
-  font-size:13px;font-weight:700;color:var(--muted);
-  transition:all 0.2s;margin-top:1px;
-}
-.opt.selected{border-color:var(--accent2);background:rgba(0,153,255,0.06);}
-.opt.selected .opt-letter{background:var(--accent2);color:#fff;}
-.opt.correct{border-color:var(--correct);background:rgba(0,200,150,0.08);}
+.opt-letter{width:30px;height:30px;flex-shrink:0;border-radius:9px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--muted);transition:all .2s;margin-top:1px;}
+.opt.correct{border-color:var(--correct);background:rgba(0,200,150,.08);}
 .opt.correct .opt-letter{background:var(--correct);color:#fff;}
-.opt.wrong{border-color:var(--wrong);background:rgba(255,71,87,0.08);}
+.opt.wrong{border-color:var(--wrong);background:rgba(255,71,87,.08);}
 .opt.wrong .opt-letter{background:var(--wrong);color:#fff;}
-.opt:disabled{cursor:default;opacity:0.55;}
+.opt:disabled{cursor:default;opacity:.55;}
 .opt.correct,.opt.wrong{opacity:1!important;}
 
-/* Feedback panel */
-.feedback-panel{
-  margin-top:16px;border-radius:16px;padding:16px 18px;
-  display:none;animation:panelIn 0.25s ease;
-}
+/* Star button */
+.star-btn{background:none;border:none;font-size:22px;cursor:pointer;padding:4px;transition:transform .2s;display:block;margin-top:12px;}
+.star-btn:active{transform:scale(1.3);}
+
+.feedback-panel{margin-top:14px;border-radius:16px;padding:16px 18px;display:none;animation:panelIn .25s ease;}
 @keyframes panelIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 .feedback-panel.show{display:block;}
-.feedback-panel.correct-fb{background:rgba(0,200,150,0.08);border:1px solid rgba(0,200,150,0.25);}
-.feedback-panel.wrong-fb{background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.25);}
-.fb-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.feedback-panel.correct-fb{background:rgba(0,200,150,.08);border:1px solid rgba(0,200,150,.25);}
+.feedback-panel.wrong-fb{background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.25);}
+.fb-header{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
 .fb-icon{font-size:18px;}
-.fb-title{font-size:14px;font-weight:700;}
+.fb-title{font-size:15px;font-weight:700;}
 .fb-title.c{color:var(--correct);}
 .fb-title.w{color:var(--wrong);}
 .fb-text{font-size:14px;color:var(--text);line-height:1.6;}
+/* SRS info in feedback */
+.srs-info{margin-top:10px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;}
 
-/* Bottom action */
-.quiz-bottom{
-  position:fixed;bottom:0;left:0;right:0;
-  padding:16px 20px calc(16px + env(safe-area-inset-bottom));
-  background:linear-gradient(to top,var(--bg) 60%,transparent);
-  z-index:50;
-}
-.btn-action{
-  width:100%;border:none;border-radius:18px;
-  padding:20px;font-size:17px;font-weight:700;
-  cursor:pointer;font-family:'Sora',sans-serif;
-  transition:all 0.15s;
-}
+.quiz-bottom{position:fixed;bottom:0;left:0;right:0;padding:14px 20px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--bg) 60%,transparent);z-index:50;}
+.btn-action{width:100%;border:none;border-radius:18px;padding:20px;font-size:17px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;transition:all .15s;}
 .btn-action.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;}
 .btn-action.secondary{background:var(--s2);border:1px solid var(--border2);color:var(--text);}
-.btn-action:active{transform:scale(0.97);}
-.btn-action:disabled{opacity:0.3;cursor:default;transform:none;}
+.btn-action:active{transform:scale(.97);}
+.btn-action:disabled{opacity:.3;cursor:default;transform:none;}
 
-/* ═══════════════════════════════════
-   RESULTS SCREEN
-═══════════════════════════════════ */
-#screen-results{
-  background:radial-gradient(ellipse 80% 40% at 50% 0%,#082040 0%,var(--bg) 60%);
-  align-items:center;
-  padding:48px 20px 40px;
-  gap:0;
-  padding-bottom:0!important;
+/* ══ FLASHCARD ══ */
+#screen-flash{background:var(--bg);}
+.flash-bar{display:flex;align-items:center;gap:12px;padding:16px 20px;background:var(--s1);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;}
+.flash-body{padding:20px;flex:1;display:flex;flex-direction:column;gap:14px;}
+.flash-card{
+  background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:28px 22px;min-height:200px;
+  display:flex;flex-direction:column;justify-content:center;
+  cursor:pointer;transition:all .2s;box-shadow:var(--shadow);
+  position:relative;overflow:hidden;
 }
-.result-emoji{font-size:72px;text-align:center;margin-bottom:12px;animation:bounceIn 0.5s cubic-bezier(.34,1.56,.64,1);}
-@keyframes bounceIn{from{transform:scale(0);}to{transform:scale(1);}}
-.result-h1{font-family:'Playfair Display',serif;font-size:32px;text-align:center;color:var(--text);margin-bottom:6px;}
-.result-sub{font-size:14px;color:var(--muted);text-align:center;margin-bottom:28px;}
+.flash-card:active{transform:scale(.99);}
+.flash-question{font-family:'Playfair Display',serif;font-size:clamp(18px,4.5vw,22px);line-height:1.65;color:var(--text);}
+.flash-reveal{margin-top:18px;display:none;border-top:1px solid var(--border);padding-top:16px;}
+.flash-reveal.show{display:block;animation:panelIn .2s ease;}
+.flash-answer{font-size:17px;font-weight:700;color:var(--accent);margin-bottom:8px;}
+.flash-explanation{font-size:14px;color:var(--text2);line-height:1.6;}
+.flash-tap-hint{font-size:13px;color:var(--muted);text-align:center;margin-top:8px;}
+.flash-actions{display:flex;gap:10px;}
+.flash-btn{flex:1;border:none;border-radius:14px;padding:16px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;}
+.flash-btn.wrong{background:rgba(255,71,87,.12);border:1.5px solid rgba(255,71,87,.3);color:var(--wrong);}
+.flash-btn.correct{background:rgba(0,200,150,.12);border:1.5px solid rgba(0,200,150,.3);color:var(--correct);}
 
-/* Ring */
-.ring-wrap{position:relative;width:150px;height:150px;margin:0 auto 28px;}
+/* ══ SIMULACRO ══ */
+#screen-sim{background:var(--bg);}
+.sim-bar{display:flex;align-items:center;gap:12px;padding:16px 20px;background:var(--s1);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;}
+.sim-timer{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--text);min-width:56px;text-align:center;}
+.sim-timer.urgent{color:var(--wrong);}
+.sim-body{padding:20px 20px 160px;flex:1;}
+/* sim uses same .opt .q-text styles */
+.sim-bottom{position:fixed;bottom:0;left:0;right:0;padding:14px 20px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--bg) 60%,transparent);z-index:50;}
+
+/* ══ RESULTS ══ */
+#screen-results{background:radial-gradient(ellipse 80% 40% at 50% 0%,#082040,var(--bg) 60%);align-items:center;padding:44px 20px 20px;gap:0;}
+[data-theme="light"] #screen-results{background:radial-gradient(ellipse 80% 40% at 50% 0%,#c8d8f8,var(--bg) 60%);}
+.result-emoji{font-size:64px;text-align:center;margin-bottom:10px;animation:bounceIn .5s cubic-bezier(.34,1.56,.64,1);}
+@keyframes bounceIn{from{transform:scale(0);}to{transform:scale(1);}}
+.result-h1{font-family:'Playfair Display',serif;font-size:30px;text-align:center;color:var(--text);margin-bottom:4px;}
+.result-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:20px;}
+.ring-wrap{position:relative;width:140px;height:140px;margin:0 auto 20px;}
 .ring-svg{transform:rotate(-90deg);}
 .ring-track{fill:none;stroke:var(--s2);stroke-width:12;}
 .ring-fill{fill:none;stroke-width:12;stroke-linecap:round;transition:stroke-dashoffset 1s cubic-bezier(.34,1.56,.64,1);}
 .ring-inner-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.ring-pct{font-family:'Playfair Display',serif;font-size:36px;color:var(--text);}
+.ring-pct{font-family:'Playfair Display',serif;font-size:34px;color:var(--text);}
 .ring-lbl{font-size:11px;color:var(--muted);}
-
-/* Stats grid */
-.stats-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
-  width:100%;margin-bottom:24px;
-}
-.sg-item{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:16px;padding:14px 10px;text-align:center;
-}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;margin-bottom:16px;}
+.sg-item{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 10px;text-align:center;}
 .sg-val{font-family:'Playfair Display',serif;font-size:26px;}
 .sg-val.g{color:var(--correct);}
 .sg-val.r{color:var(--wrong);}
-.sg-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-top:3px;}
-
-/* XP earned */
-.xp-earned{
-  background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.3);
-  border-radius:100px;padding:10px 24px;
-  font-size:15px;font-weight:700;color:var(--xp);
-  margin-bottom:24px;
-}
-
+.sg-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;}
+.xp-earned{background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);border-radius:100px;padding:10px 24px;font-size:15px;font-weight:700;color:var(--xp);margin-bottom:16px;}
 .res-btns{display:flex;flex-direction:column;gap:10px;width:100%;}
-.btn-res{
-  width:100%;border-radius:16px;padding:18px;
-  font-size:16px;font-weight:700;cursor:pointer;
-  font-family:'Sora',sans-serif;border:none;
-}
+.btn-res{width:100%;border-radius:16px;padding:18px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;border:none;}
 .btn-res.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;}
 .btn-res.secondary{background:var(--s2);border:1px solid var(--border2);color:var(--text);}
 
-/* ═══════════════════════════════════
-   STATS SCREEN
-═══════════════════════════════════ */
+/* ══ STATS ══ */
 #screen-stats{background:var(--bg);}
-.stats-header{
-  padding:56px 20px 20px;
-  display:flex;align-items:center;gap:14px;
-}
-.stats-body{padding:0 20px 40px;display:flex;flex-direction:column;gap:16px;}
-
-/* Overall card */
-.overall-card{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:20px;padding:20px;
-}
-.oc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
-.oc-title{font-size:18px;font-weight:700;color:var(--text);}
+.period-tabs{display:flex;gap:8px;padding:0 20px 14px;}
+.period-tab{flex:1;background:var(--s2);border:1.5px solid var(--border);border-radius:100px;padding:9px 4px;text-align:center;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;}
+.period-tab.active{background:rgba(0,212,170,.12);border-color:var(--accent);color:var(--accent);}
+.stats-body{padding:0 20px;display:flex;flex-direction:column;gap:12px;}
+.overall-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:20px;box-shadow:var(--shadow);}
+.oc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;}
+.oc-title{font-size:17px;font-weight:700;color:var(--text);}
 .oc-total{font-size:13px;color:var(--muted);}
-.oc-stats{display:flex;gap:12px;}
+.oc-stats{display:flex;gap:10px;}
 .oc-stat{flex:1;text-align:center;}
-.oc-val{font-family:'Playfair Display',serif;font-size:28px;}
-.oc-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;}
-
-/* Per-specialty bars */
-.spec-stat-item{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:16px;padding:16px;
-}
+.oc-val{font-family:'Playfair Display',serif;font-size:26px;}
+.oc-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+.spec-stat-item{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--shadow);}
 .ssi-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
 .ssi-name{font-size:15px;font-weight:600;color:var(--text);}
 .ssi-pct{font-size:15px;font-weight:700;}
 .ssi-bar{height:8px;background:var(--s1);border-radius:100px;overflow:hidden;}
-.ssi-fill{height:100%;border-radius:100px;transition:width 0.8s cubic-bezier(.34,1.56,.64,1);}
+.ssi-fill{height:100%;border-radius:100px;transition:width .8s cubic-bezier(.34,1.56,.64,1);}
 .ssi-meta{display:flex;justify-content:space-between;margin-top:6px;}
 .ssi-meta span{font-size:11px;color:var(--muted);}
+.session-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow);}
+.sess-icon{font-size:26px;flex-shrink:0;}
+.sess-info{flex:1;min-width:0;}
+.sess-title{font-size:14px;font-weight:600;color:var(--text);}
+.sess-meta{font-size:12px;color:var(--muted);margin-top:2px;}
+.sess-score{text-align:right;flex-shrink:0;}
+.sess-pct{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;}
+.sess-qs{font-size:11px;color:var(--muted);}
+/* Hard questions list */
+.hard-q-item{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);}
+.hq-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px;}
+.hq-text{font-size:14px;color:var(--text);line-height:1.5;flex:1;}
+.hq-badge{flex-shrink:0;background:rgba(255,71,87,.12);border:1px solid rgba(255,71,87,.3);border-radius:8px;padding:3px 8px;font-size:11px;font-weight:700;color:var(--wrong);}
+.hq-meta{font-size:11px;color:var(--muted);}
 
-/* Weak badge */
-.weak-badge{
-  background:rgba(255,71,87,0.1);border:1px solid rgba(255,71,87,0.25);
-  border-radius:6px;padding:2px 8px;
-  font-size:10px;font-weight:700;color:var(--wrong);
-}
-
-/* ═══════════════════════════════════
-   ADMIN SCREEN
-═══════════════════════════════════ */
+/* ══ ADMIN ══ */
 #screen-admin{background:var(--bg);}
-.admin-header{padding:56px 20px 20px;display:flex;align-items:center;gap:14px;}
-.admin-body{padding:0 20px 60px;display:flex;flex-direction:column;gap:14px;}
-
+.admin-body{padding:0 20px;display:flex;flex-direction:column;gap:14px;}
 .form-group{display:flex;flex-direction:column;gap:6px;}
-.form-label{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;}
-.form-input{
-  background:var(--s2);border:1.5px solid var(--border);
-  border-radius:12px;padding:16px 16px;
-  font-size:16px;color:var(--text);
-  font-family:'Sora',sans-serif;
-  outline:none;transition:border-color 0.15s;
-  width:100%;
-  -webkit-appearance:none;
-}
+.form-label{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+.form-input{background:var(--s2);border:1.5px solid var(--border);border-radius:12px;padding:16px;font-size:16px;color:var(--text);font-family:'Sora',sans-serif;outline:none;transition:border-color .15s;width:100%;-webkit-appearance:none;}
 .form-input:focus{border-color:var(--accent);}
 .form-input::placeholder{color:var(--muted2);}
 select.form-input{cursor:pointer;}
-
-.option-inputs{display:flex;flex-direction:column;gap:8px;}
 .opt-input-row{display:flex;gap:8px;align-items:center;}
-.opt-ltr{
-  width:36px;height:36px;flex-shrink:0;border-radius:10px;
-  background:var(--s1);border:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  font-size:13px;font-weight:700;color:var(--muted);
-}
-.correct-sel{display:flex;gap:8px;flex-wrap:wrap;}
-.correct-opt{
-  width:44px;height:44px;border-radius:12px;
-  background:var(--s2);border:1.5px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  font-size:15px;font-weight:700;color:var(--muted);
-  cursor:pointer;transition:all 0.15s;
-}
-.correct-opt.active{background:rgba(0,212,170,0.15);border-color:var(--accent);color:var(--accent);}
+.opt-ltr{width:36px;height:36px;flex-shrink:0;border-radius:10px;background:var(--s1);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--muted);}
+.correct-sel{display:flex;gap:8px;}
+.correct-opt{width:48px;height:48px;border-radius:12px;background:var(--s2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s;}
+.correct-opt.active{background:rgba(0,212,170,.15);border-color:var(--accent);color:var(--accent);}
+.btn-save{width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;border:none;border-radius:16px;padding:18px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;margin-top:4px;}
 
-.btn-save{
-  width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));
-  color:#000;border:none;border-radius:16px;
-  padding:18px;font-size:16px;font-weight:700;
-  cursor:pointer;font-family:'Sora',sans-serif;
-  margin-top:8px;
-}
-
-/* ─── BOTTOM NAV ─── */
-.bottom-nav{
-  position:fixed;bottom:0;left:0;right:0;
-  background:var(--s1);border-top:1px solid var(--border);
-  display:flex;
-  padding-bottom:max(env(safe-area-inset-bottom), 8px);
-  z-index:200;
-  min-height:64px;
-}
-.nav-item{
-  flex:1;display:flex;flex-direction:column;align-items:center;
-  padding:10px 4px 8px;cursor:pointer;
-  transition:all 0.15s;
-  background:none;border:none;color:var(--muted);
-  font-family:'Sora',sans-serif;
-}
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--border);display:flex;padding-bottom:max(env(safe-area-inset-bottom),6px);z-index:200;height:calc(var(--nav-h) + max(env(safe-area-inset-bottom),6px));}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px;cursor:pointer;transition:all .15s;background:none;border:none;color:var(--muted);font-family:'Sora',sans-serif;}
 .nav-item.active{color:var(--accent);}
-.nav-icon{font-size:24px;margin-bottom:3px;}
-.nav-lbl{font-size:11px;font-weight:600;letter-spacing:0.04em;}
+.nav-icon{font-size:22px;margin-bottom:2px;}
+.nav-lbl{font-size:10px;font-weight:600;letter-spacing:.04em;}
 
-/* ─── LOADING ─── */
-#loading{
-  position:fixed;inset:0;background:var(--bg);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  z-index:9999;gap:16px;
-}
-.spinner{
-  width:44px;height:44px;border-radius:50%;
-  border:3px solid var(--border2);border-top-color:var(--accent);
-  animation:spin 0.7s linear infinite;
-}
+/* LOADING */
+#loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px;}
+.spinner{width:44px;height:44px;border-radius:50%;border:3px solid var(--border2);border-top-color:var(--accent);animation:spin .7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .loading-txt{font-size:14px;color:var(--muted);}
 .loading-logo{font-family:'Playfair Display',serif;font-size:32px;color:var(--text);margin-bottom:8px;}
 .loading-logo span{color:var(--accent);font-style:italic;}
-
-/* ─── MISC ─── */
-.empty-state{text-align:center;padding:48px 24px;color:var(--muted);}
+.empty-state{text-align:center;padding:40px 24px;color:var(--muted);}
 .empty-state .es-icon{font-size:48px;margin-bottom:12px;}
 .empty-state p{font-size:14px;line-height:1.6;}
+.section-sub-hdr{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:600;}
 </style>
 </head>
 <body>
 
-<!-- LOADING -->
-<div id="loading">
-  <div class="loading-logo">Med<span>Res</span></div>
-  <div class="spinner"></div>
-  <div class="loading-txt">Conectando con Supabase…</div>
-</div>
-
-<!-- TOAST -->
+<div id="loading"><div class="loading-logo">Med<span>Res</span></div><div class="spinner"></div><div class="loading-txt">Cargando tu banco de preguntas…</div></div>
 <div id="toast"></div>
 
-<!-- ══════════════════════════════════
-  SCREEN: HOME
-══════════════════════════════════ -->
+<!-- ══ HOME ══ -->
 <div class="screen" id="screen-home">
   <div class="home-top">
-    <div class="home-greeting">¡Bienvenido, Dr. Michael!</div>
-    <h1 class="home-title">Domina tu<br><span>Residencia</span></h1>
+    <div>
+      <div class="home-greeting">¡Bienvenido, Dr. Michael!</div>
+      <h1 class="home-title">Domina tu<br><span>Residencia</span></h1>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">🌙</button>
   </div>
-
   <div class="hud-row">
-    <div class="hud-pill">
-      <div class="hud-icon">🔥</div>
-      <div class="hud-info">
-        <div class="hud-val" id="hud-streak">0</div>
-        <div class="hud-lbl">Racha días</div>
-      </div>
-    </div>
-    <div class="hud-pill">
-      <div class="hud-icon">⚡</div>
-      <div class="hud-info">
-        <div class="hud-val" id="hud-xp">0</div>
-        <div class="hud-lbl">XP total</div>
-      </div>
-    </div>
-    <div class="hud-pill">
-      <div class="hud-icon">🎯</div>
-      <div class="hud-info">
-        <div class="hud-val" id="hud-accuracy">—</div>
-        <div class="hud-lbl">Acierto</div>
-      </div>
-    </div>
+    <div class="hud-pill"><div class="hud-icon">🔥</div><div><div class="hud-val" id="hud-streak">0</div><div class="hud-lbl">Racha</div></div></div>
+    <div class="hud-pill"><div class="hud-icon">⚡</div><div><div class="hud-val" id="hud-xp">0</div><div class="hud-lbl">XP</div></div></div>
+    <div class="hud-pill"><div class="hud-icon">🎯</div><div><div class="hud-val" id="hud-accuracy">—</div><div class="hud-lbl">Acierto</div></div></div>
   </div>
-
   <div class="level-bar-wrap">
-    <div class="level-row">
-      <div class="level-txt" id="level-txt">Nivel 1 · Estudiante</div>
-      <div class="level-xp" id="level-xp-txt">0 / 100 XP</div>
-    </div>
+    <div class="level-row"><div class="level-txt" id="level-txt">Nivel · Estudiante</div><div class="level-xp" id="level-xp-txt">0/100 XP</div></div>
     <div class="level-track"><div class="level-fill" id="level-fill" style="width:0%"></div></div>
   </div>
-
-  <div class="section-hdr">Empezar examen</div>
+  <div id="review-banner-wrap"></div>
+  <div class="section-hdr">Modos de estudio</div>
   <div class="quick-grid">
-    <div class="quick-card" onclick="openConfig('quick5')">
-      <div class="qc-icon">⚡</div>
-      <div class="qc-title">Rápido</div>
-      <div class="qc-desc">5 preguntas random</div>
-      <div class="qc-badge">5</div>
-    </div>
-    <div class="quick-card" onclick="openConfig('quick10')">
-      <div class="qc-icon">🎯</div>
-      <div class="qc-title">Estándar</div>
-      <div class="qc-desc">10 preguntas</div>
-      <div class="qc-badge">10</div>
-    </div>
-    <div class="quick-card" onclick="openConfig('weak')">
-      <div class="qc-icon">💪</div>
-      <div class="qc-title">Mis débiles</div>
-      <div class="qc-desc">Donde más fallo</div>
-    </div>
-    <div class="quick-card" onclick="openConfig('custom')">
-      <div class="qc-icon">🛠</div>
-      <div class="qc-title">Personalizado</div>
-      <div class="qc-desc">Elige cantidad y tema</div>
-    </div>
+    <div class="quick-card" onclick="openConfig('quick10')"><div class="qc-icon">⚡</div><div class="qc-title">Rápido</div><div class="qc-desc">10 preguntas random</div><div class="qc-badge">10</div></div>
+    <div class="quick-card" onclick="openConfig('weak')"><div class="qc-icon">💪</div><div class="qc-title">Mis débiles</div><div class="qc-desc">Donde más fallo</div></div>
+    <div class="quick-card" onclick="openFlashPick()"><div class="qc-icon">🃏</div><div class="qc-title">Flashcard</div><div class="qc-desc">Ver y revelar</div></div>
+    <div class="quick-card" onclick="openSimConfig()"><div class="qc-icon">🏥</div><div class="qc-title">Simulacro</div><div class="qc-desc">Examen UNAL real</div></div>
   </div>
-
   <div class="section-hdr">Por especialidad</div>
   <div class="spec-list" id="home-spec-list"></div>
-  <div style="height:90px;"></div>
 </div>
 
-<!-- ══════════════════════════════════
-  SCREEN: CONFIG
-══════════════════════════════════ -->
+<!-- ══ CONFIG ══ -->
 <div class="screen" id="screen-config">
   <div class="config-header">
-    <button class="btn-back" onclick="showScreen('home')">←</button>
+    <button class="btn-back" onclick="navTo('home')">←</button>
     <div class="config-title">Configurar examen</div>
+    <button class="theme-toggle" onclick="toggleTheme()" style="margin-left:auto;" id="theme-btn-cfg">🌙</button>
   </div>
   <div class="config-body">
-
-    <div class="cfg-section">
-      <div class="cfg-label">Número de preguntas</div>
+    <div><div class="cfg-label">Preguntas</div>
       <div class="count-pills">
         <div class="count-pill" data-n="5" onclick="selectCount(5)">5</div>
-        <div class="count-pill" data-n="10" onclick="selectCount(10)">10</div>
-        <div class="count-pill active" data-n="15" onclick="selectCount(15)">15</div>
+        <div class="count-pill active" data-n="10" onclick="selectCount(10)">10</div>
+        <div class="count-pill" data-n="15" onclick="selectCount(15)">15</div>
         <div class="count-pill" data-n="20" onclick="selectCount(20)">20</div>
         <div class="count-pill" data-n="30" onclick="selectCount(30)">30</div>
       </div>
     </div>
-
-    <div class="cfg-section">
-      <div class="cfg-label">Modo</div>
+    <div><div class="cfg-label">Modo</div>
       <div class="mode-grid">
-        <div class="mode-card active" id="mode-normal" onclick="selectMode('normal')">
-          <div class="mode-icon">📝</div>
-          <div class="mode-title">Normal</div>
-          <div class="mode-desc">Con feedback</div>
-        </div>
-        <div class="mode-card" id="mode-timed" onclick="selectMode('timed')">
-          <div class="mode-icon">⏱</div>
-          <div class="mode-title">Cronómetro</div>
-          <div class="mode-desc">Tiempo por pregunta</div>
-        </div>
+        <div class="mode-card active" id="mode-normal" onclick="selectMode('normal')"><div class="mode-icon">📝</div><div class="mode-title">Normal</div><div class="mode-desc">Con feedback</div></div>
+        <div class="mode-card" id="mode-srs" onclick="selectMode('srs')"><div class="mode-icon">🧠</div><div class="mode-title">Repaso SRS</div><div class="mode-desc">Repetición espaciada</div></div>
       </div>
     </div>
-
-    <div class="cfg-section">
-      <div class="cfg-label" style="display:flex;justify-content:space-between;align-items:center;">
-        Especialidades
-        <button class="select-all-btn" onclick="toggleAllSpecs()">Seleccionar todas</button>
-      </div>
+    <div>
+      <div class="cfg-label">Especialidades <button class="select-all-btn" id="select-all-btn" onclick="toggleAllSpecs()">Todas</button></div>
       <div class="spec-check-list" id="spec-check-list"></div>
     </div>
+    <button class="btn-start-exam" onclick="startExam()">Iniciar examen →</button>
   </div>
-
-  <button class="btn-start-exam" onclick="startExam()">Iniciar examen →</button>
 </div>
 
-<!-- ══════════════════════════════════
-  SCREEN: QUIZ
-══════════════════════════════════ -->
+<!-- ══ QUIZ ══ -->
 <div class="screen" id="screen-quiz">
   <div class="quiz-bar">
-    <button class="quiz-close" onclick="confirmLeave()">✕</button>
-    <div class="quiz-progress-wrap">
-      <div class="quiz-progress-fill" id="quiz-prog" style="width:0%"></div>
-    </div>
+    <button class="quiz-close" onclick="confirmLeave('quiz')">✕</button>
+    <div class="quiz-progress-wrap"><div class="quiz-progress-fill" id="quiz-prog" style="width:0%"></div></div>
     <div class="hearts" id="hearts-row"></div>
   </div>
-
   <div class="quiz-body">
     <div class="q-num" id="q-num">Pregunta 1 de 10</div>
     <div class="q-spec-tag" id="q-spec-tag">Especialidad</div>
     <div class="q-text" id="q-text">Cargando…</div>
     <div class="options" id="options"></div>
+    <button class="star-btn" id="star-btn" onclick="toggleStar()">☆</button>
     <div class="feedback-panel" id="feedback-panel">
-      <div class="fb-header">
-        <span class="fb-icon" id="fb-icon">✅</span>
-        <span class="fb-title" id="fb-title">¡Correcto!</span>
-      </div>
+      <div class="fb-header"><span class="fb-icon" id="fb-icon">✅</span><span class="fb-title" id="fb-title">¡Correcto!</span></div>
       <div class="fb-text" id="fb-text"></div>
+      <div class="srs-info" id="srs-info"></div>
     </div>
   </div>
+  <div class="quiz-bottom"><button class="btn-action secondary" id="btn-action" disabled onclick="handleAction()">Selecciona una opción</button></div>
+</div>
 
-  <div class="quiz-bottom">
-    <button class="btn-action primary" id="btn-action" disabled onclick="handleAction()">Continuar</button>
+<!-- ══ FLASHCARD: SELECTOR DE CATEGORÍA ══ -->
+<div class="screen" id="screen-flash-pick">
+  <div class="top-bar">
+    <div class="top-bar-title">🃏 Flashcards</div>
+    <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn-flash">🌙</button>
+  </div>
+  <div style="padding:0 20px 10px;">
+    <p style="font-size:14px;color:var(--muted);margin-bottom:16px;">Elige una especialidad para repasar:</p>
+    <div class="flash-btn-all" onclick="startFlashcard(null)"
+      style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;border:none;border-radius:16px;padding:16px 20px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;width:100%;text-align:left;margin-bottom:12px;display:flex;align-items:center;gap:12px;">
+      <span style="font-size:24px;">🔀</span>
+      <div><div>Todas las especialidades</div><div style="font-size:12px;font-weight:400;opacity:.8;" id="flash-all-count">… preguntas</div></div>
+    </div>
+    <div id="flash-spec-pick-list" style="display:flex;flex-direction:column;gap:8px;"></div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════
-  SCREEN: RESULTS
-══════════════════════════════════ -->
+<!-- ══ FLASHCARD: PANTALLA DE CARTA ══ -->
+<div class="screen" id="screen-flash">
+  <div class="flash-bar">
+    <button class="quiz-close" onclick="backToFlashPick()">←</button>
+    <div class="quiz-progress-wrap"><div class="quiz-progress-fill" id="flash-prog" style="width:0%"></div></div>
+    <div style="font-size:13px;color:var(--muted);white-space:nowrap;" id="flash-counter">1/10</div>
+  </div>
+  <div class="flash-body">
+    <div class="flash-card" id="flash-card" onclick="revealFlash()">
+      <div class="q-spec-tag" id="flash-spec-tag">Especialidad</div>
+      <div class="flash-question" id="flash-question">Cargando…</div>
+      <div class="flash-tap-hint" id="flash-hint">👆 Toca para ver la respuesta</div>
+      <div class="flash-reveal" id="flash-reveal">
+        <div class="flash-answer" id="flash-answer"></div>
+        <div class="flash-explanation" id="flash-explanation"></div>
+      </div>
+    </div>
+    <div class="flash-actions" id="flash-actions" style="display:none;">
+      <button class="flash-btn wrong" onclick="flashAnswer(false)">✗ No sabía</button>
+      <button class="flash-btn correct" onclick="flashAnswer(true)">✓ Lo sabía</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SIMULACRO ══ -->
+<div class="screen" id="screen-sim">
+  <div class="sim-bar">
+    <button class="quiz-close" onclick="confirmLeave('sim')">✕</button>
+    <div class="quiz-progress-wrap"><div class="quiz-progress-fill" id="sim-prog" style="width:0%"></div></div>
+    <div class="sim-timer" id="sim-timer">90:00</div>
+  </div>
+  <div class="sim-body">
+    <div class="q-num" id="sim-q-num">Pregunta 1 de 60</div>
+    <div class="q-spec-tag" id="sim-spec-tag">Especialidad</div>
+    <div class="q-text" id="sim-q-text">Cargando…</div>
+    <div class="options" id="sim-options"></div>
+  </div>
+  <div class="sim-bottom">
+    <div style="display:flex;gap:10px;">
+      <button class="btn-action secondary" id="sim-prev" onclick="simPrev()" style="flex:0 0 56px;padding:20px 0;font-size:20px;">←</button>
+      <button class="btn-action primary" id="sim-action" onclick="simNext()" style="flex:1;">Siguiente →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ RESULTS ══ -->
 <div class="screen" id="screen-results">
   <div class="result-emoji" id="res-emoji">🏆</div>
   <div class="result-h1" id="res-title">¡Excelente!</div>
   <div class="result-sub" id="res-sub">Revisa tu desempeño</div>
-
   <div class="ring-wrap">
-    <svg class="ring-svg" width="150" height="150" viewBox="0 0 150 150">
-      <circle class="ring-track" cx="75" cy="75" r="63"/>
-      <circle class="ring-fill" id="ring-fill" cx="75" cy="75" r="63"
-        stroke="url(#rg)" stroke-dasharray="395.84" stroke-dashoffset="395.84"/>
-      <defs>
-        <linearGradient id="rg" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stop-color="#00d4aa"/>
-          <stop offset="100%" stop-color="#0099ff"/>
-        </linearGradient>
-      </defs>
+    <svg class="ring-svg" width="140" height="140" viewBox="0 0 140 140">
+      <circle class="ring-track" cx="70" cy="70" r="58"/>
+      <circle class="ring-fill" id="ring-fill" cx="70" cy="70" r="58" stroke="url(#rg)" stroke-dasharray="364.4" stroke-dashoffset="364.4"/>
+      <defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#00d4aa"/><stop offset="100%" stop-color="#0099ff"/></linearGradient></defs>
     </svg>
-    <div class="ring-inner-text">
-      <div class="ring-pct" id="ring-pct">0%</div>
-      <div class="ring-lbl">Acierto</div>
-    </div>
+    <div class="ring-inner-text"><div class="ring-pct" id="ring-pct">0%</div><div class="ring-lbl">Acierto</div></div>
   </div>
-
   <div class="stats-grid">
     <div class="sg-item"><div class="sg-val g" id="sg-correct">0</div><div class="sg-lbl">Correctas</div></div>
     <div class="sg-item"><div class="sg-val r" id="sg-wrong">0</div><div class="sg-lbl">Incorrectas</div></div>
     <div class="sg-item"><div class="sg-val" id="sg-total" style="color:var(--text)">0</div><div class="sg-lbl">Total</div></div>
   </div>
-
   <div class="xp-earned" id="xp-earned">+0 XP</div>
-
   <div class="res-btns">
-    <button class="btn-res primary" onclick="retryExam()">🔄 Repetir examen</button>
-    <button class="btn-res secondary" onclick="showScreen('home')">← Inicio</button>
+    <button class="btn-res primary" onclick="retryExam()">🔄 Repetir</button>
+    <button class="btn-res secondary" onclick="navTo('home')">← Inicio</button>
   </div>
 </div>
 
-<!-- ══════════════════════════════════
-  SCREEN: STATS
-══════════════════════════════════ -->
+<!-- ══ STATS ══ -->
 <div class="screen" id="screen-stats">
-  <div class="stats-header">
-    <div style="font-family:'Playfair Display',serif;font-size:26px;color:var(--text);">Estadísticas</div>
+  <div class="top-bar">
+    <div class="top-bar-title">Estadísticas</div>
+    <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn-stats">🌙</button>
   </div>
-  <div class="stats-body" id="stats-body">
-    <div class="empty-state"><div class="es-icon">📊</div><p>Cargando estadísticas…</p></div>
+  <div class="period-tabs">
+    <div class="period-tab active" data-p="all" onclick="selectPeriod('all')">Total</div>
+    <div class="period-tab" data-p="week" onclick="selectPeriod('week')">Semana</div>
+    <div class="period-tab" data-p="month" onclick="selectPeriod('month')">Mes</div>
+    <div class="period-tab" data-p="hard" onclick="selectPeriod('hard')">Difíciles</div>
+    <div class="period-tab" data-p="sessions" onclick="selectPeriod('sessions')">Sesiones</div>
   </div>
-  <div style="height:80px;"></div>
+  <div class="stats-body" id="stats-body"></div>
 </div>
 
-<!-- ══════════════════════════════════
-  SCREEN: ADMIN
-══════════════════════════════════ -->
+<!-- ══ ADMIN ══ -->
 <div class="screen" id="screen-admin">
-  <div class="admin-header">
-    <div style="font-family:'Playfair Display',serif;font-size:26px;color:var(--text);">Agregar pregunta</div>
+  <div class="top-bar">
+    <div class="top-bar-title">Agregar pregunta</div>
+    <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn-admin">🌙</button>
   </div>
   <div class="admin-body">
-
-    <div class="form-group">
-      <div class="form-label">Especialidad</div>
-      <select class="form-input" id="af-specialty">
-        <option value="">Selecciona especialidad…</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <div class="form-label">Nueva especialidad (opcional)</div>
-      <input class="form-input" id="af-new-specialty" placeholder="Ej: Oftalmología" type="text">
-    </div>
-
-    <div class="form-group">
-      <div class="form-label">Enunciado / Caso clínico</div>
-      <textarea class="form-input" id="af-question" rows="4" placeholder="Describe el caso clínico o pregunta…" style="resize:none;"></textarea>
-    </div>
-
-    <div class="form-group">
-      <div class="form-label">Opciones de respuesta</div>
-      <div class="option-inputs">
-        <div class="opt-input-row">
-          <div class="opt-ltr">A</div>
-          <input class="form-input" id="af-optA" placeholder="Opción A" type="text">
-        </div>
-        <div class="opt-input-row">
-          <div class="opt-ltr">B</div>
-          <input class="form-input" id="af-optB" placeholder="Opción B" type="text">
-        </div>
-        <div class="opt-input-row">
-          <div class="opt-ltr">C</div>
-          <input class="form-input" id="af-optC" placeholder="Opción C" type="text">
-        </div>
-        <div class="opt-input-row">
-          <div class="opt-ltr">D</div>
-          <input class="form-input" id="af-optD" placeholder="Opción D" type="text">
-        </div>
+    <div class="form-group"><div class="form-label">Especialidad existente</div><select class="form-input" id="af-specialty"><option value="">Selecciona…</option></select></div>
+    <div class="form-group"><div class="form-label">O nueva especialidad</div><input class="form-input" id="af-new-specialty" placeholder="Ej: Oftalmología" type="text"></div>
+    <div class="form-group"><div class="form-label">Enunciado / Caso clínico</div><textarea class="form-input" id="af-question" rows="4" placeholder="Describe el caso clínico…" style="resize:none;"></textarea></div>
+    <div class="form-group"><div class="form-label">Opciones</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="opt-input-row"><div class="opt-ltr">A</div><input class="form-input" id="af-optA" placeholder="Opción A" type="text"></div>
+        <div class="opt-input-row"><div class="opt-ltr">B</div><input class="form-input" id="af-optB" placeholder="Opción B" type="text"></div>
+        <div class="opt-input-row"><div class="opt-ltr">C</div><input class="form-input" id="af-optC" placeholder="Opción C" type="text"></div>
+        <div class="opt-input-row"><div class="opt-ltr">D</div><input class="form-input" id="af-optD" placeholder="Opción D" type="text"></div>
       </div>
     </div>
-
-    <div class="form-group">
-      <div class="form-label">Respuesta correcta</div>
+    <div class="form-group"><div class="form-label">Respuesta correcta</div>
       <div class="correct-sel">
         <div class="correct-opt active" data-l="A" onclick="selectCorrect('A')">A</div>
         <div class="correct-opt" data-l="B" onclick="selectCorrect('B')">B</div>
@@ -835,703 +545,962 @@ select.form-input{cursor:pointer;}
         <div class="correct-opt" data-l="D" onclick="selectCorrect('D')">D</div>
       </div>
     </div>
-
-    <div class="form-group">
-      <div class="form-label">Explicación (opcional)</div>
-      <textarea class="form-input" id="af-explanation" rows="3" placeholder="Explica por qué es correcta esa respuesta…" style="resize:none;"></textarea>
-    </div>
-
-    <div class="form-group">
-      <div class="form-label">Fuente / Referencia (opcional)</div>
-      <input class="form-input" id="af-source" placeholder="Ej: Harrison 20ed, Cap 42" type="text">
-    </div>
-
+    <div class="form-group"><div class="form-label">Explicación (opcional)</div><textarea class="form-input" id="af-explanation" rows="3" placeholder="¿Por qué es correcta?" style="resize:none;"></textarea></div>
+    <div class="form-group"><div class="form-label">Fuente (opcional)</div><input class="form-input" id="af-source" placeholder="Harrison 20ed, Cap 42" type="text"></div>
     <button class="btn-save" onclick="saveQuestion()">💾 Guardar pregunta</button>
-  </div>
-  <div style="height:80px;"></div>
-</div>
 
-<!-- ══════════════════════════════════
-  BOTTOM NAV
-══════════════════════════════════ -->
+    <!-- EDIT / DELETE -->
+    <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border);">
+      <div class="form-label" style="margin-bottom:12px;">Editar o eliminar pregunta existente</div>
+      <div class="form-group">
+        <select class="form-input" id="edit-specialty-filter" onchange="loadEditList()">
+          <option value="">Filtrar por especialidad…</option>
+        </select>
+      </div>
+      <div id="edit-q-list" style="display:flex;flex-direction:column;gap:8px;margin-top:8px;"></div>
+    </div>
+
+    </div><!-- end edit-modal -->
+  </div><!-- end admin-body -->
+</div><!-- end screen-admin -->
+
+<!-- NAV -->
 <nav class="bottom-nav" id="bottom-nav">
-  <button class="nav-item active" id="nav-home" onclick="navTo('home')">
-    <div class="nav-icon">🏠</div>
-    <div class="nav-lbl">Inicio</div>
-  </button>
-  <button class="nav-item" id="nav-config" onclick="navTo('config')">
-    <div class="nav-icon">📝</div>
-    <div class="nav-lbl">Examen</div>
-  </button>
-  <button class="nav-item" id="nav-stats" onclick="navTo('stats')">
-    <div class="nav-icon">📊</div>
-    <div class="nav-lbl">Stats</div>
-  </button>
-  <button class="nav-item" id="nav-admin" onclick="navTo('admin')">
-    <div class="nav-icon">➕</div>
-    <div class="nav-lbl">Agregar</div>
-  </button>
+  <button class="nav-item active" id="nav-home" onclick="navTo('home')"><div class="nav-icon">🏠</div><div class="nav-lbl">Inicio</div></button>
+  <button class="nav-item" id="nav-config" onclick="navTo('config')"><div class="nav-icon">📝</div><div class="nav-lbl">Examen</div></button>
+  <button class="nav-item" id="nav-stats" onclick="navTo('stats')"><div class="nav-icon">📊</div><div class="nav-lbl">Stats</div></button>
+  <button class="nav-item" id="nav-admin" onclick="navTo('admin')"><div class="nav-icon">➕</div><div class="nav-lbl">Agregar</div></button>
 </nav>
 
-<!-- ══════════════════════════════════
-  JAVASCRIPT
-══════════════════════════════════ -->
 <script>
-// ─── SUPABASE CONFIG ──────────────────────────────────────
-const SUPA_URL = 'https://iuobmzybqgxunqjydgbt.supabase.co';
-const SUPA_KEY = 'sb_publishable_JGsiQqXRm-PyGMOcOcB9fQ_EkbLj3Dp';
+// ══════════════════════════════════════
+//  SUPABASE
+// ══════════════════════════════════════
+const SUPA_URL='https://iuobmzybqgxunqjydgbt.supabase.co';
+const SUPA_KEY='sb_publishable_JGsiQqXRm-PyGMOcOcB9fQ_EkbLj3Dp';
+const H={'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'};
 
-const supa = {
-  async query(table, opts={}) {
-    let url = `${SUPA_URL}/rest/v1/${table}?`;
-    if (opts.select) url += `select=${opts.select}&`;
-    if (opts.filter) url += `${opts.filter}&`;
-    if (opts.order)  url += `order=${opts.order}&`;
-    if (opts.limit)  url += `limit=${opts.limit}&`;
-    const r = await fetch(url, {
-      headers: {
-        'apikey': SUPA_KEY,
-        'Authorization': `Bearer ${SUPA_KEY}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    if (!r.ok) throw new Error(await r.text());
+const db={
+  async get(table,opts={}){
+    let u=`${SUPA_URL}/rest/v1/${table}?`;
+    if(opts.select)u+=`select=${opts.select}&`;
+    if(opts.filter)u+=`${opts.filter}&`;
+    if(opts.order)u+=`order=${opts.order}&`;
+    if(opts.limit)u+=`limit=${opts.limit}&`;
+    const r=await fetch(u,{headers:H});
+    if(!r.ok)throw new Error(await r.text());
     return r.json();
   },
-  async insert(table, data) {
-    const r = await fetch(`${SUPA_URL}/rest/v1/${table}`, {
-      method: 'POST',
-      headers: {
-        'apikey': SUPA_KEY,
-        'Authorization': `Bearer ${SUPA_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=representation'
-      },
-      body: JSON.stringify(data)
-    });
-    if (!r.ok) throw new Error(await r.text());
-    return r.json();
+  async post(table,data,prefer='return=representation'){
+    const r=await fetch(`${SUPA_URL}/rest/v1/${table}`,{method:'POST',headers:{...H,'Prefer':prefer},body:JSON.stringify(data)});
+    if(!r.ok)throw new Error(await r.text());
+    return prefer.includes('representation')?r.json():null;
   },
-  async upsert(table, data) {
-    const r = await fetch(`${SUPA_URL}/rest/v1/${table}`, {
-      method: 'POST',
-      headers: {
-        'apikey': SUPA_KEY,
-        'Authorization': `Bearer ${SUPA_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates,return=representation'
-      },
-      body: JSON.stringify(data)
-    });
-    if (!r.ok) throw new Error(await r.text());
+  async patch(table,filter,data){
+    const r=await fetch(`${SUPA_URL}/rest/v1/${table}?${filter}`,{method:'PATCH',headers:{...H,'Prefer':'return=minimal'},body:JSON.stringify(data)});
+    if(!r.ok)throw new Error(await r.text());
+  },
+  async upsert(table,data){
+    const r=await fetch(`${SUPA_URL}/rest/v1/${table}`,{method:'POST',headers:{...H,'Prefer':'resolution=merge-duplicates,return=representation'},body:JSON.stringify(data)});
+    if(!r.ok)throw new Error(await r.text());
     return r.json();
   }
 };
 
-// ─── STATE ────────────────────────────────────────────────
-let allQuestions   = [];
-let examQuestions  = [];
-let examIdx        = 0;
-let examScore      = 0;
-let examAnswered   = 0;
-let examConfig     = { count: 15, mode: 'normal', specialties: [] };
-let lastExamConfig = null;
-let hearts         = 5;
-let stats          = {}; // {specialty: {correct, total}}
-let profile        = { xp: 0, streak: 0, lastDate: null };
-let selectedCorrect = 'A';
+// ══════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════
+let allQuestions=[],progressMap={};
+let examQuestions=[],examIdx=0,examScore=0;
+let examConfig={count:10,mode:'normal',specialties:[]};
+let lastExamConfig=null,hearts=999;
+let stats={},profile={xp:0,streak:0,lastDate:null},sessions=[];
+let selectedCorrect='A',currentPeriod='all';
+// Flashcard state
+let flashQuestions=[],flashIdx=0,flashRevealed=false;
+// Simulacro state
+let simQuestions=[],simIdx=0,simAnswers=[],simTimer=null,simSeconds=0;
+// Current question starred state
+let currentStarred=false;
 
-const SPEC_ICONS = {
-  'Medicina Interna':'🫀','Cirugía':'🔪','Pediatría':'🧒','Ginecología':'🌸',
-  'Neurología':'🧠','Urgencias':'🚨','Psiquiatría':'🧘','Dermatología':'🩹',
-  'Cardiología':'❤️','Neumología':'🫁','Gastroenterología':'🔬','Endocrinología':'⚗️',
-  'Infectología':'🦠','Nefrología':'💧','Reumatología':'🦴','Oncología':'🎗️',
-  'Ortopedia':'🦾','Oftalmología':'👁️','Otorrinolaringología':'👂','Urología':'🩺',
-  'Hematología':'🩸','Anestesiología':'💉','Radiología':'📡','default':'📋'
-};
-const SPEC_COLORS = [
-  '#1d4ed8','#7c3aed','#0891b2','#db2777','#059669',
-  '#dc2626','#d97706','#65a30d','#0e7490','#9333ea',
-  '#c2410c','#15803d','#1e40af','#be185d','#0369a1'
-];
+const SPEC_ICONS={'Medicina Interna':'🫀','Cirugía General':'🔪','Cirugía':'🔪','Pediatría':'🧒','Ginecología':'🌸','Neurología':'🧠','Urgencias':'🚨','Psiquiatría':'🧘','Dermatología':'🩹','Cardiología':'❤️','Neumología':'🫁','Gastroenterología':'🔬','Endocrinología':'⚗️','Infectología':'🦠','Nefrología':'💧','Reumatología':'🦴','Oncología':'🎗️','Ortopedia':'🦾','Oftalmología':'👁️','Otorrinolaringología':'👂','Urología':'🩺','Hematología':'🩸','Anestesiología':'💉','Radiología':'📡','Anatomía':'🦷','Fisiología':'🫀','Farmacología':'💊','Bioquímica':'🧬','Inmunología':'🛡️','Microbiología':'🦠','Genética':'🔬','Fisiopatología':'🔬','Electrofisiología':'⚡','Laboratorio Clínico':'🧪','Traumatología':'🦴','default':'📋'};
+const SPEC_COLORS=['#1d4ed8','#7c3aed','#0891b2','#db2777','#059669','#dc2626','#d97706','#65a30d','#0e7490','#9333ea','#c2410c','#15803d','#1e40af','#be185d','#0369a1','#b45309','#0f766e','#7e22ce'];
+const LEVELS=[{min:0,max:100,name:'Estudiante'},{min:100,max:300,name:'Interno'},{min:300,max:600,name:'Residente R1'},{min:600,max:1000,name:'Residente R2'},{min:1000,max:1500,name:'Residente R3'},{min:1500,max:2200,name:'Médico Especialista'},{min:2200,max:3000,name:'Fellow'},{min:3000,max:9999,name:'Adjunto Asistente'}];
 
-function specIcon(name) { return SPEC_ICONS[name] || SPEC_ICONS.default; }
-function specColor(name, idx) {
-  const keys = Object.keys(SPEC_ICONS);
-  return SPEC_COLORS[keys.indexOf(name) % SPEC_COLORS.length] || SPEC_COLORS[idx % SPEC_COLORS.length];
-}
+function specIcon(n){return SPEC_ICONS[n]||SPEC_ICONS.default;}
+function specColor(n,i){const k=Object.keys(SPEC_ICONS);const idx=k.indexOf(n);return SPEC_COLORS[(idx>=0?idx:i)%SPEC_COLORS.length];}
+function getLevel(xp){return LEVELS.find(l=>xp>=l.min&&xp<l.max)||LEVELS[LEVELS.length-1];}
 
-// ─── LEVELS ───────────────────────────────────────────────
-const LEVELS = [
-  {min:0,   max:100,  name:'Estudiante'},
-  {min:100, max:300,  name:'Interno'},
-  {min:300, max:600,  name:'Residente R1'},
-  {min:600, max:1000, name:'Residente R2'},
-  {min:1000,max:1500, name:'Residente R3'},
-  {min:1500,max:2200, name:'Médico Especialista'},
-  {min:2200,max:3000, name:'Fellow'},
-  {min:3000,max:9999, name:'Adjunto Asistente'}
-];
-function getLevel(xp) {
-  return LEVELS.find(l => xp >= l.min && xp < l.max) || LEVELS[LEVELS.length-1];
-}
-
-// ─── INIT ─────────────────────────────────────────────────
-window.onload = async () => {
-  loadLocalState();
-  try {
-    await ensureTables();
-    await loadQuestions();
-    renderHome();
-    renderSpecCheckList();
-    renderAdminSpecSelect();
-  } catch(e) {
-    console.error(e);
-    showToast('⚠️ Error conectando. Verifica la API key.');
+// ══════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════
+window.onload=async()=>{
+  loadLocal();
+  applyTheme();
+  try{
+    allQuestions=await db.get('questions',{select:'*',order:'id.asc'});
+    if(!Array.isArray(allQuestions))allQuestions=[];
+    await loadProgress();
+    await loadCloudStats();
+  }catch(e){
+    allQuestions=getDemoQ();
+    showToast('📦 Modo demo');
   }
-  hideLoading();
-  showScreen('home');
+  renderHome();renderSpecCheckList();renderAdminSpecSelect();
+  hideLoading();showScreen('home');
 };
 
-async function ensureTables() {
-  // Just try to query — tables must be created via Supabase dashboard
-  // SQL to run in Supabase SQL Editor (shown in README below)
-  try {
-    await supa.query('questions', { limit: 1 });
-  } catch(e) {
-    // Table may not exist yet — show instructions
-    showToast('⚠️ Crea las tablas en Supabase. Ver instrucciones abajo.');
-  }
+async function loadProgress(){
+  try{
+    const rows=await db.get('progress',{select:'*'});
+    progressMap={};
+    (rows||[]).forEach(r=>{progressMap[r.question_id]=r;});
+  }catch(e){progressMap={};}
 }
 
-async function loadQuestions() {
-  try {
-    allQuestions = await supa.query('questions', {
-      select: '*',
-      order: 'id.asc'
-    });
-    if (!Array.isArray(allQuestions)) allQuestions = [];
-  } catch(e) {
-    allQuestions = getDemoQuestions();
-    showToast('📦 Usando preguntas demo (sin conexión)');
-  }
-}
-
-// ─── LOCAL STATE ──────────────────────────────────────────
-function loadLocalState() {
-  try {
-    const s = JSON.parse(localStorage.getItem('medres_stats') || '{}');
-    stats = s;
-    const p = JSON.parse(localStorage.getItem('medres_profile') || '{}');
-    profile = { xp: p.xp||0, streak: p.streak||0, lastDate: p.lastDate||null };
+// ══════════════════════════════════════
+//  LOCAL + CLOUD STORAGE
+// ══════════════════════════════════════
+function loadLocal(){
+  try{
+    stats=JSON.parse(localStorage.getItem('mr_stats')||'{}');
+    const p=JSON.parse(localStorage.getItem('mr_profile')||'{}');
+    profile={xp:p.xp||0,streak:p.streak||0,lastDate:p.lastDate||null};
+    sessions=JSON.parse(localStorage.getItem('mr_sessions')||'[]');
+    const th=localStorage.getItem('mr_theme')||'dark';
+    document.documentElement.setAttribute('data-theme',th);
     updateStreak();
-  } catch(e) {}
+  }catch(e){}
+}
+function saveLocal(){
+  localStorage.setItem('mr_stats',JSON.stringify(stats));
+  localStorage.setItem('mr_profile',JSON.stringify(profile));
+  localStorage.setItem('mr_sessions',JSON.stringify(sessions));
 }
 
-function saveLocalState() {
-  localStorage.setItem('medres_stats', JSON.stringify(stats));
-  localStorage.setItem('medres_profile', JSON.stringify(profile));
+// Sync stats & sessions to Supabase (fire-and-forget)
+async function syncToCloud(){
+  try{
+    // Upsert each specialty stat
+    const rows=Object.entries(stats).map(([specialty,s])=>({
+      specialty,correct:s.correct||0,wrong:(s.total||0)-(s.correct||0),
+      xp:profile.xp,streak:profile.streak,last_date:profile.lastDate||'',
+      updated_at:new Date().toISOString()
+    }));
+    for(const row of rows){
+      await db.upsert('user_stats',row).catch(()=>{});
+    }
+    // Save last 20 sessions to cloud
+    const recent=sessions.slice(0,20);
+    // Don't duplicate — just insert new ones (no upsert key, so we track locally)
+    // We mark sessions with cloud:true once saved
+    const unsaved=recent.filter(s=>!s.cloud);
+    for(const s of unsaved){
+      try{
+        await db.post('sessions',{
+          date:s.date,
+          specialties:s.specialties||[],
+          score:s.score,total:s.total,pct:s.pct,mode:s.mode||'normal'
+        },'return=minimal');
+        s.cloud=true;
+      }catch(e){}
+    }
+    saveLocal();
+  }catch(e){}
 }
 
-function updateStreak() {
-  const today = new Date().toDateString();
-  if (profile.lastDate === today) return;
-  const yesterday = new Date(Date.now() - 86400000).toDateString();
-  if (profile.lastDate === yesterday) {
-    profile.streak++;
-  } else if (profile.lastDate !== today) {
-    profile.streak = profile.lastDate ? 0 : profile.streak;
+// Load stats from cloud on startup (merge with local)
+async function loadCloudStats(){
+  try{
+    const rows=await db.get('user_stats',{select:'*'});
+    if(!Array.isArray(rows)||rows.length===0)return;
+    // Merge: take max of local vs cloud
+    rows.forEach(r=>{
+      const local=stats[r.specialty]||{correct:0,total:0};
+      const cloudTotal=(r.correct||0)+(r.wrong||0);
+      if(cloudTotal>local.total){
+        stats[r.specialty]={correct:r.correct||0,total:cloudTotal};
+      }
+      // Merge XP — take highest
+      if((r.xp||0)>profile.xp)profile.xp=r.xp;
+      if((r.streak||0)>profile.streak)profile.streak=r.streak;
+    });
+    saveLocal();
+  }catch(e){}
+}
+function updateStreak(){
+  const today=new Date().toDateString();
+  if(profile.lastDate===today)return;
+  const yest=new Date(Date.now()-86400000).toDateString();
+  if(profile.lastDate===yest)profile.streak++;
+  else if(profile.lastDate&&profile.lastDate!==today)profile.streak=0;
+}
+
+// ══════════════════════════════════════
+//  THEME
+// ══════════════════════════════════════
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute('data-theme');
+  const next=cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  localStorage.setItem('mr_theme',next);
+  applyTheme();
+}
+function applyTheme(){
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  const icon=isDark?'🌙':'☀️';
+  ['theme-btn','theme-btn-cfg','theme-btn-stats','theme-btn-admin'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.textContent=icon;
+  });
+}
+
+// ══════════════════════════════════════
+//  SRS — SM-2 ALGORITHM
+// ══════════════════════════════════════
+function sm2(prog,quality){
+  // quality: 0=wrong, 1=hard, 2=correct, 3=easy (we use 0 or 2)
+  let{ease_factor=2.5,interval_days=1,repetitions=0}=prog||{};
+  if(quality>=2){
+    if(repetitions===0)interval_days=1;
+    else if(repetitions===1)interval_days=3;
+    else interval_days=Math.round(interval_days*ease_factor);
+    repetitions++;
+    ease_factor=Math.max(1.3,ease_factor+0.1-((3-quality)*((3-quality)*0.08+0.02)));
+  }else{
+    repetitions=0;interval_days=1;
   }
+  const next=new Date();next.setDate(next.getDate()+interval_days);
+  return{ease_factor,interval_days,repetitions,next_review:next.toISOString().split('T')[0]};
 }
 
-// ─── RENDER HOME ──────────────────────────────────────────
-function renderHome() {
-  // HUD
-  document.getElementById('hud-streak').textContent = profile.streak;
-  document.getElementById('hud-xp').textContent = profile.xp;
-  const totalC = Object.values(stats).reduce((a,s)=>a+(s.correct||0),0);
-  const totalT = Object.values(stats).reduce((a,s)=>a+(s.total||0),0);
-  const acc = totalT > 0 ? Math.round(totalC/totalT*100)+'%' : '—';
-  document.getElementById('hud-accuracy').textContent = acc;
+async function updateProgress(qId,correct,starred){
+  const today=new Date().toISOString().split('T')[0];
+  const existing=progressMap[qId];
+  const quality=correct?2:0;
+  const srsResult=sm2(existing,quality);
+  const newProg={
+    question_id:qId,
+    correct:(existing?.correct||0)+(correct?1:0),
+    wrong:(existing?.wrong||0)+(correct?0:1),
+    ease_factor:srsResult.ease_factor,
+    interval_days:srsResult.interval_days,
+    repetitions:srsResult.repetitions,
+    next_review:srsResult.next_review,
+    last_seen:new Date().toISOString(),
+    starred:starred!==undefined?starred:(existing?.starred||false)
+  };
+  try{
+    const saved=await db.upsert('progress',newProg);
+    progressMap[qId]=(saved&&saved[0])||newProg;
+  }catch(e){progressMap[qId]=newProg;}
+  return srsResult;
+}
 
-  // Level
-  const lv = getLevel(profile.xp);
-  const pct = ((profile.xp - lv.min) / (lv.max - lv.min) * 100).toFixed(1);
-  document.getElementById('level-txt').textContent = `Nivel · ${lv.name}`;
-  document.getElementById('level-xp-txt').textContent = `${profile.xp} / ${lv.max} XP`;
-  document.getElementById('level-fill').style.width = pct + '%';
+function getDueToday(){
+  const today=new Date().toISOString().split('T')[0];
+  return allQuestions.filter(q=>{
+    const p=progressMap[q.id];
+    if(!p)return true; // never seen
+    return p.next_review<=today;
+  });
+}
 
-  // Specialty list
-  const specs = [...new Set(allQuestions.map(q => q.specialty))].sort();
-  const list = document.getElementById('home-spec-list');
-  list.innerHTML = specs.map((sp, i) => {
-    const st    = stats[sp] || {correct:0, total:0};
-    const pct2  = st.total > 0 ? Math.round(st.correct / st.total * 100) : 0;
-    const color = specColor(sp, i);
-    const count = allQuestions.filter(q=>q.specialty===sp).length;
-    const isWeak = st.total >= 5 && pct2 < 60;
+// ══════════════════════════════════════
+//  HOME
+// ══════════════════════════════════════
+function renderHome(){
+  document.getElementById('hud-streak').textContent=profile.streak;
+  document.getElementById('hud-xp').textContent=profile.xp;
+  const totalC=Object.values(stats).reduce((a,s)=>a+(s.correct||0),0);
+  const totalT=Object.values(stats).reduce((a,s)=>a+(s.total||0),0);
+  document.getElementById('hud-accuracy').textContent=totalT>0?Math.round(totalC/totalT*100)+'%':'—';
+  const lv=getLevel(profile.xp);
+  const pct=((profile.xp-lv.min)/(lv.max-lv.min)*100).toFixed(1);
+  document.getElementById('level-txt').textContent=`Nivel · ${lv.name}`;
+  document.getElementById('level-xp-txt').textContent=`${profile.xp}/${lv.max} XP`;
+  document.getElementById('level-fill').style.width=pct+'%';
+
+  // Review banner
+  const due=getDueToday();
+  const banner=document.getElementById('review-banner-wrap');
+  if(due.length>0){
+    banner.innerHTML=`<div class="review-banner" style="margin:12px 20px 0;" onclick="startSRSReview()">
+      <div class="rb-icon">🧠</div>
+      <div class="rb-info"><div class="rb-title">Repasar hoy</div><div class="rb-sub">Repetición espaciada pendiente</div></div>
+      <div class="rb-count">${due.length}</div>
+    </div>`;
+  }else{
+    banner.innerHTML='';
+  }
+
+  const specs=[...new Set(allQuestions.map(q=>q.specialty))].sort();
+  document.getElementById('home-spec-list').innerHTML=specs.map((sp,i)=>{
+    const st=stats[sp]||{correct:0,total:0};
+    const p2=st.total>0?Math.round(st.correct/st.total*100):0;
+    const color=specColor(sp,i);
+    const count=allQuestions.filter(q=>q.specialty===sp).length;
+    const isWeak=st.total>=5&&p2<60;const isDone=st.total>=5&&p2>=80;
+    const badge=isWeak?'<span class="weak-badge">Débil</span>':isDone?'<span class="done-badge">✓ Dominado</span>':'';
+    const pc=p2>=70?'var(--correct)':p2>=50?'var(--warn)':'var(--wrong)';
     return `<div class="spec-row" onclick="openConfig('specialty','${escapeHtml(sp)}')">
       <div class="sr-icon" style="background:${color}22;">${specIcon(sp)}</div>
-      <div class="sr-info">
-        <div class="sr-name">${escapeHtml(sp)}${isWeak?' <span class="weak-badge">Débil</span>':''}</div>
-        <div class="sr-sub">${count} preguntas · ${st.total} respondidas</div>
-      </div>
-      <div class="sr-progress">
-        <div class="sr-pct" style="color:${pct2>=70?'var(--correct)':pct2>=50?'var(--warn)':'var(--wrong)'}">${st.total>0?pct2+'%':'—'}</div>
-        <div class="sr-bar"><div class="sr-fill" style="width:${pct2}%;background:${pct2>=70?'var(--correct)':pct2>=50?'var(--warn)':'var(--wrong)'}"></div></div>
-      </div>
+      <div class="sr-info"><div class="sr-name">${escapeHtml(sp)} ${badge}</div><div class="sr-sub">${count} preguntas · ${st.total} respondidas</div></div>
+      <div class="sr-progress"><div class="sr-pct" style="color:${pc}">${st.total>0?p2+'%':'—'}</div><div class="sr-bar"><div class="sr-fill" style="width:${p2}%;background:${pc}"></div></div></div>
     </div>`;
   }).join('');
 }
 
-// ─── CONFIG ───────────────────────────────────────────────
-function openConfig(type, specialty) {
-  if (type === 'quick5') {
-    examConfig.count = 5;
-    examConfig.mode = 'normal';
-    examConfig.specialties = [...new Set(allQuestions.map(q=>q.specialty))];
-    startExam(); return;
+// ══════════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════════
+function openConfig(type,specialty){
+  const allSpecs=[...new Set(allQuestions.map(q=>q.specialty))];
+  if(type==='quick10'){examConfig={count:10,mode:'normal',specialties:[...allSpecs]};startExam();return;}
+  if(type==='weak'){
+    const weak=Object.entries(stats).filter(([,s])=>s.total>=3&&(s.correct/s.total)<.65).map(([sp])=>sp);
+    examConfig={count:10,mode:'normal',specialties:weak.length>0?weak:[...allSpecs]};startExam();return;
   }
-  if (type === 'quick10') {
-    examConfig.count = 10;
-    examConfig.mode = 'normal';
-    examConfig.specialties = [...new Set(allQuestions.map(q=>q.specialty))];
-    startExam(); return;
-  }
-  if (type === 'weak') {
-    // Find weakest specialties
-    const weak = Object.entries(stats)
-      .filter(([,s]) => s.total >= 3 && (s.correct/s.total) < 0.65)
-      .map(([sp]) => sp);
-    examConfig.specialties = weak.length > 0 ? weak :
-      [...new Set(allQuestions.map(q=>q.specialty))];
-    examConfig.count = 10;
-    examConfig.mode = 'normal';
-    startExam(); return;
-  }
-  if (type === 'specialty') {
-    examConfig.specialties = [specialty];
-    examConfig.count = 15;
-    examConfig.mode = 'normal';
-    selectCount(15);
-    renderSpecCheckList(specialty);
-    showScreen('config');
-    return;
-  }
-  // custom
-  renderSpecCheckList();
-  showScreen('config');
-  navHighlight('config');
+  if(type==='specialty'){examConfig.specialties=[specialty];examConfig.count=10;examConfig.mode='normal';selectCount(10);renderSpecCheckList(specialty);navTo('config');return;}
+  if(examConfig.specialties.length===0)examConfig.specialties=[...allSpecs];
+  renderSpecCheckList();navTo('config');
 }
 
-function renderSpecCheckList(preselect) {
-  const specs = [...new Set(allQuestions.map(q=>q.specialty))].sort();
-  if (examConfig.specialties.length === 0) examConfig.specialties = [...specs];
-  const list = document.getElementById('spec-check-list');
-  list.innerHTML = specs.map(sp => {
-    const count = allQuestions.filter(q=>q.specialty===sp).length;
-    const active = preselect ? sp===preselect : examConfig.specialties.includes(sp);
-    return `<div class="spec-check ${active?'active':''}" data-sp="${escapeHtml(sp)}" onclick="toggleSpec('${escapeHtml(sp)}',this)">
+function startSRSReview(){
+  const due=shuffle(getDueToday()).slice(0,20);
+  if(due.length===0){showToast('✅ ¡Todo repasado por hoy!');return;}
+  examQuestions=due;lastExamConfig=JSON.parse(JSON.stringify(examConfig));
+  examIdx=0;examScore=0;hearts=999;
+  renderHearts();renderQuestion();showScreen('quiz');hideNav();
+}
+
+function renderSpecCheckList(preselect){
+  const specs=[...new Set(allQuestions.map(q=>q.specialty))].sort();
+  const allSpecs=[...new Set(allQuestions.map(q=>q.specialty))];
+  if(examConfig.specialties.length===0)examConfig.specialties=[...allSpecs];
+  if(preselect)examConfig.specialties=[preselect];
+  const allSel=examConfig.specialties.length===specs.length;
+  const btn=document.getElementById('select-all-btn');
+  if(btn)btn.textContent=allSel?'Ninguna':'Todas';
+  document.getElementById('spec-check-list').innerHTML=specs.map(sp=>{
+    const count=allQuestions.filter(q=>q.specialty===sp).length;
+    const active=examConfig.specialties.includes(sp);
+    return `<div class="spec-check ${active?'active':''}" onclick="toggleSpec('${escapeHtml(sp)}',this)">
       <div class="sc-checkbox">${active?'✓':''}</div>
       <div class="sc-label">${specIcon(sp)} ${escapeHtml(sp)}</div>
       <div class="sc-n">${count}</div>
     </div>`;
   }).join('');
-  if (preselect) examConfig.specialties = [preselect];
 }
-
-function toggleSpec(sp, el) {
-  const idx = examConfig.specialties.indexOf(sp);
-  if (idx >= 0) { examConfig.specialties.splice(idx,1); el.classList.remove('active'); el.querySelector('.sc-checkbox').textContent=''; }
-  else          { examConfig.specialties.push(sp);       el.classList.add('active');    el.querySelector('.sc-checkbox').textContent='✓'; }
+function toggleSpec(sp,el){
+  const idx=examConfig.specialties.indexOf(sp);
+  if(idx>=0){examConfig.specialties.splice(idx,1);el.classList.remove('active');el.querySelector('.sc-checkbox').textContent='';}
+  else{examConfig.specialties.push(sp);el.classList.add('active');el.querySelector('.sc-checkbox').textContent='✓';}
+  const specs=[...new Set(allQuestions.map(q=>q.specialty))];
+  const btn=document.getElementById('select-all-btn');
+  if(btn)btn.textContent=examConfig.specialties.length===specs.length?'Ninguna':'Todas';
 }
-
-function toggleAllSpecs() {
-  const specs = [...new Set(allQuestions.map(q=>q.specialty))];
-  const allSelected = examConfig.specialties.length === specs.length;
-  examConfig.specialties = allSelected ? [] : [...specs];
-  renderSpecCheckList();
+function toggleAllSpecs(){
+  const specs=[...new Set(allQuestions.map(q=>q.specialty))];
+  const allSel=examConfig.specialties.length===specs.length;
+  examConfig.specialties=allSel?[]:[...specs];renderSpecCheckList();
 }
+function selectCount(n){examConfig.count=n;document.querySelectorAll('.count-pill').forEach(el=>el.classList.toggle('active',parseInt(el.dataset.n)===n));}
+function selectMode(m){examConfig.mode=m;document.getElementById('mode-normal').classList.toggle('active',m==='normal');document.getElementById('mode-srs').classList.toggle('active',m==='srs');}
 
-function selectCount(n) {
-  examConfig.count = n;
-  document.querySelectorAll('.count-pill').forEach(el => {
-    el.classList.toggle('active', parseInt(el.dataset.n) === n);
-  });
-}
-
-function selectMode(m) {
-  examConfig.mode = m;
-  document.getElementById('mode-normal').classList.toggle('active', m==='normal');
-  document.getElementById('mode-timed').classList.toggle('active', m==='timed');
-}
-
-// ─── EXAM ─────────────────────────────────────────────────
-function startExam() {
-  if (examConfig.specialties.length === 0) { showToast('⚠️ Selecciona al menos una especialidad'); return; }
-  const pool = shuffle(allQuestions.filter(q => examConfig.specialties.includes(q.specialty)));
-  if (pool.length === 0) { showToast('⚠️ No hay preguntas para esa selección'); return; }
-  examQuestions = pool.slice(0, examConfig.count);
-  lastExamConfig = JSON.parse(JSON.stringify(examConfig));
-  examIdx = 0; examScore = 0; examAnswered = 0;
-  hearts = examConfig.mode === 'timed' ? 3 : 999;
-  renderHearts();
-  renderQuestion();
-  showScreen('quiz');
-  hideNav();
-}
-
-function renderQuestion() {
-  const q = examQuestions[examIdx];
-  const total = examQuestions.length;
-  document.getElementById('q-num').textContent = `Pregunta ${examIdx+1} de ${total}`;
-  document.getElementById('q-spec-tag').textContent = `${specIcon(q.specialty)} ${q.specialty}`;
-  document.getElementById('q-text').textContent = q.question || q.enunciado || '';
-  document.getElementById('quiz-prog').style.width = `${(examIdx/total)*100}%`;
-
-  const opts = [
-    {l:'A', t: q.opt_a || q['Opción A'] || ''},
-    {l:'B', t: q.opt_b || q['Opción B'] || ''},
-    {l:'C', t: q.opt_c || q['Opción C'] || ''},
-    {l:'D', t: q.opt_d || q['Opción D'] || ''}
-  ].filter(o => o.t.trim() !== '');
-
-  document.getElementById('options').innerHTML = opts.map(o =>
-    `<button class="opt" id="opt-${o.l}" onclick="selectOpt('${o.l}')">
-      <span class="opt-letter">${o.l}</span>
-      <span>${escapeHtml(o.t)}</span>
-    </button>`
-  ).join('');
-
-  document.getElementById('feedback-panel').className = 'feedback-panel';
-  const btn = document.getElementById('btn-action');
-  btn.disabled = true;
-  btn.className = 'btn-action secondary';
-  btn.textContent = 'Selecciona una opción';
-
-  // Re-animate
-  const body = document.querySelector('#screen-quiz .quiz-body');
-  body.style.animation='none'; body.offsetHeight; body.style.animation='';
-}
-
-function selectOpt(letter) {
-  const q = examQuestions[examIdx];
-  const correct = (q.correct_answer || q['Respuesta Correcta'] || 'A').toString().trim().toUpperCase();
-  const isCorrect = letter === correct;
-
-  // Block all options
-  ['A','B','C','D'].forEach(l => {
-    const el = document.getElementById(`opt-${l}`);
-    if (!el) return;
-    el.disabled = true;
-    if (l === correct) el.classList.add('correct');
-    else if (l === letter && !isCorrect) el.classList.add('wrong');
-  });
-
-  examAnswered++;
-  if (isCorrect) {
-    examScore++;
-    // Stats
-    if (!stats[q.specialty]) stats[q.specialty] = {correct:0,total:0};
-    stats[q.specialty].correct++;
-    stats[q.specialty].total++;
-    showFeedback(true, q.explanation || `La respuesta correcta es ${correct}.`);
-    spawnXP('+10 XP', document.getElementById(`opt-${letter}`));
-    profile.xp += 10;
-  } else {
-    if (!stats[q.specialty]) stats[q.specialty] = {correct:0,total:0};
-    stats[q.specialty].total++;
-    showFeedback(false, q.explanation || `La respuesta correcta es ${correct}.`);
-    if (hearts < 999) { hearts--; renderHearts(); }
+// ══════════════════════════════════════
+//  EXAM
+// ══════════════════════════════════════
+function startExam(){
+  if(examConfig.specialties.length===0){showToast('⚠️ Selecciona al menos una especialidad');return;}
+  let pool;
+  if(examConfig.mode==='srs'){
+    const due=getDueToday().filter(q=>examConfig.specialties.includes(q.specialty));
+    pool=shuffle(due.length>0?due:allQuestions.filter(q=>examConfig.specialties.includes(q.specialty)));
+  }else{
+    pool=shuffle(allQuestions.filter(q=>examConfig.specialties.includes(q.specialty)));
   }
-
-  profile.lastDate = new Date().toDateString();
-  saveLocalState();
-
-  const btn = document.getElementById('btn-action');
-  btn.disabled = false;
-  btn.className = 'btn-action primary';
-  btn.textContent = examIdx + 1 < examQuestions.length ? 'Continuar →' : 'Ver resultados →';
+  if(pool.length===0){showToast('⚠️ No hay preguntas');return;}
+  examQuestions=pool.slice(0,examConfig.count);
+  lastExamConfig=JSON.parse(JSON.stringify(examConfig));
+  examIdx=0;examScore=0;hearts=999;
+  renderHearts();renderQuestion();showScreen('quiz');hideNav();
 }
 
-function showFeedback(correct, text) {
-  const panel = document.getElementById('feedback-panel');
-  panel.className = `feedback-panel ${correct ? 'correct-fb' : 'wrong-fb'} show`;
-  document.getElementById('fb-icon').textContent = correct ? '✅' : '❌';
-  document.getElementById('fb-title').textContent = correct ? '¡Correcto!' : 'Incorrecto';
-  document.getElementById('fb-title').className = `fb-title ${correct ? 'c' : 'w'}`;
-  document.getElementById('fb-text').textContent = text;
+function renderQuestion(){
+  const q=examQuestions[examIdx],total=examQuestions.length;
+  document.getElementById('q-num').textContent=`Pregunta ${examIdx+1} de ${total}`;
+  document.getElementById('q-spec-tag').textContent=`${specIcon(q.specialty)} ${q.specialty}`;
+  document.getElementById('q-text').textContent=q.question||'';
+  document.getElementById('quiz-prog').style.width=`${(examIdx/total)*100}%`;
+  const opts=[{l:'A',t:q.opt_a||''},{l:'B',t:q.opt_b||''},{l:'C',t:q.opt_c||''},{l:'D',t:q.opt_d||''}].filter(o=>o.t.trim()!=='');
+  document.getElementById('options').innerHTML=opts.map(o=>`<button class="opt" id="opt-${o.l}" onclick="selectOpt('${o.l}')"><span class="opt-letter">${o.l}</span><span>${escapeHtml(o.t)}</span></button>`).join('');
+  document.getElementById('feedback-panel').className='feedback-panel';
+  document.getElementById('srs-info').textContent='';
+  const btn=document.getElementById('btn-action');
+  btn.disabled=true;btn.className='btn-action secondary';btn.textContent='Selecciona una opción';
+  // Star button
+  const starred=progressMap[q.id]?.starred||false;
+  currentStarred=starred;
+  document.getElementById('star-btn').textContent=starred?'⭐':'☆';
+  document.getElementById('screen-quiz').scrollTo(0,0);
 }
 
-function handleAction() {
-  if (examIdx + 1 < examQuestions.length) {
-    examIdx++;
-    renderQuestion();
-    document.getElementById('screen-quiz').scrollTo(0, 0);
-  } else {
-    showResults();
+async function selectOpt(letter){
+  const q=examQuestions[examIdx];
+  const correct=(q.correct_answer||'A').toString().trim().toUpperCase();
+  const isCorrect=letter===correct;
+  ['A','B','C','D'].forEach(l=>{
+    const el=document.getElementById(`opt-${l}`);if(!el)return;
+    el.disabled=true;
+    if(l===correct)el.classList.add('correct');
+    else if(l===letter&&!isCorrect)el.classList.add('wrong');
+  });
+  // Stats
+  if(!stats[q.specialty])stats[q.specialty]={correct:0,total:0};
+  stats[q.specialty].total++;
+  if(isCorrect){examScore++;stats[q.specialty].correct++;spawnXP('+10 XP',document.getElementById(`opt-${letter}`));profile.xp+=10;}
+  profile.lastDate=new Date().toDateString();
+  // SRS update
+  const srsResult=await updateProgress(q.id,isCorrect,currentStarred);
+  saveLocal();syncToCloud();
+  // Feedback
+  showFeedback(isCorrect,q.explanation||`La respuesta correcta era ${correct}.`,srsResult);
+  const btn=document.getElementById('btn-action');
+  btn.disabled=false;btn.className='btn-action primary';
+  btn.textContent=examIdx+1<examQuestions.length?'Continuar →':'Ver resultados →';
+}
+
+function showFeedback(ok,text,srs){
+  const p=document.getElementById('feedback-panel');
+  p.className=`feedback-panel ${ok?'correct-fb':'wrong-fb'} show`;
+  document.getElementById('fb-icon').textContent=ok?'✅':'❌';
+  document.getElementById('fb-title').textContent=ok?'¡Correcto!':'Incorrecto';
+  document.getElementById('fb-title').className=`fb-title ${ok?'c':'w'}`;
+  document.getElementById('fb-text').textContent=text;
+  if(srs){
+    const d=srs.interval_days;
+    document.getElementById('srs-info').textContent=ok
+      ?`🧠 Próxima revisión en ${d} día${d!==1?'s':''}`
+      :'🔁 Esta pregunta volverá mañana';
   }
 }
 
-function renderHearts() {
-  if (hearts >= 999) { document.getElementById('hearts-row').innerHTML=''; return; }
-  document.getElementById('hearts-row').innerHTML =
-    Array.from({length:5}, (_,i) =>
-      `<span class="heart ${i >= hearts ? 'lost' : ''}">❤️</span>`
-    ).join('');
+function handleAction(){
+  if(examIdx+1<examQuestions.length){examIdx++;renderQuestion();}
+  else{showResults();}
+}
+function renderHearts(){
+  if(hearts>=999){document.getElementById('hearts-row').innerHTML='';return;}
+  document.getElementById('hearts-row').innerHTML=Array.from({length:5},(_,i)=>`<span class="heart ${i>=hearts?'lost':''}">❤️</span>`).join('');
 }
 
-// ─── RESULTS ──────────────────────────────────────────────
-function showResults() {
-  const total = examQuestions.length;
-  const pct   = total > 0 ? Math.round(examScore/total*100) : 0;
-  const xpEarned = examScore * 10 + (pct === 100 ? 50 : 0);
+// ── Star ──
+async function toggleStar(){
+  const q=examQuestions[examIdx];
+  currentStarred=!currentStarred;
+  document.getElementById('star-btn').textContent=currentStarred?'⭐':'☆';
+  await updateProgress(q.id,null,currentStarred);
+  showToast(currentStarred?'⭐ Marcada como difícil':'☆ Desmarcada');
+}
 
-  document.getElementById('sg-correct').textContent = examScore;
-  document.getElementById('sg-wrong').textContent   = total - examScore;
-  document.getElementById('sg-total').textContent   = total;
-  document.getElementById('xp-earned').textContent  = `+${xpEarned} XP ganados`;
+// ══════════════════════════════════════
+//  FLASHCARD
+// ══════════════════════════════════════
+function openFlashPick(){
+  const specs=[...new Set(allQuestions.map(q=>q.specialty))].sort();
+  // Update total count
+  const totalEl=document.getElementById('flash-all-count');
+  if(totalEl)totalEl.textContent=`${allQuestions.length} preguntas`;
+  // Apply theme icon
+  applyTheme();
+  // Build spec list
+  const list=document.getElementById('flash-spec-pick-list');
+  list.innerHTML=specs.map((sp,i)=>{
+    const count=allQuestions.filter(q=>q.specialty===sp).length;
+    const st=stats[sp]||{correct:0,total:0};
+    const pct=st.total>0?Math.round(st.correct/st.total*100):null;
+    const color=specColor(sp,i);
+    const pctStr=pct!==null?`${pct}% acierto · `:'';
+    return `<div onclick="startFlashcard('${escapeHtml(sp)}')"
+      style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 16px;
+             display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .18s;"
+      onmousedown="this.style.transform='scale(.98)'" onmouseup="this.style.transform=''">
+      <div style="width:44px;height:44px;border-radius:13px;background:${color}22;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">${specIcon(sp)}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:15px;font-weight:600;color:var(--text);">${escapeHtml(sp)}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px;">${pctStr}${count} preguntas</div>
+      </div>
+      <div style="font-size:20px;color:var(--muted);">›</div>
+    </div>`;
+  }).join('');
+  showScreen('flash-pick');
+  navHighlight('');
+}
 
-  const emoji = pct >= 90 ? '🏆' : pct >= 70 ? '🎯' : pct >= 50 ? '💪' : '📚';
-  const title = pct >= 90 ? '¡Excelente, Doctor!' : pct >= 70 ? '¡Buen trabajo!' : pct >= 50 ? 'Vas bien' : 'A estudiar más';
-  document.getElementById('res-emoji').textContent  = emoji;
-  document.getElementById('res-title').textContent  = title;
-  document.getElementById('res-sub').textContent    = `${pct}% de acierto · ${total} preguntas`;
-  document.getElementById('ring-pct').textContent   = pct + '%';
+function backToFlashPick(){
+  showScreen('flash-pick');
+  navHighlight('');
+}
 
-  // Animate ring
-  const circumference = 395.84;
-  const offset = circumference - (pct / 100 * circumference);
-  setTimeout(() => {
-    document.getElementById('ring-fill').style.strokeDashoffset = offset;
-  }, 100);
+function startFlashcard(specialty){
+  let pool=specialty
+    ? allQuestions.filter(q=>q.specialty===specialty)
+    : [...allQuestions];
+  flashQuestions=shuffle(pool);
+  if(flashQuestions.length===0){showToast('⚠️ No hay preguntas en esta categoría');return;}
+  flashIdx=0;renderFlashCard();showScreen('flash');hideNav();
+}
 
-  showScreen('results');
+function renderFlashCard(){
+  if(flashIdx>=flashQuestions.length){showResults();return;}
+  const q=flashQuestions[flashIdx];
+  flashRevealed=false;
+  document.getElementById('flash-spec-tag').textContent=`${specIcon(q.specialty)} ${q.specialty}`;
+  document.getElementById('flash-question').textContent=q.question||'';
+  document.getElementById('flash-reveal').className='flash-reveal';
+  document.getElementById('flash-hint').style.display='block';
+  document.getElementById('flash-actions').style.display='none';
+  document.getElementById('flash-counter').textContent=`${flashIdx+1}/${flashQuestions.length}`;
+  document.getElementById('flash-prog').style.width=`${(flashIdx/flashQuestions.length)*100}%`;
+  document.getElementById('screen-flash').scrollTo(0,0);
+}
+
+function revealFlash(){
+  if(flashRevealed)return;
+  flashRevealed=true;
+  const q=flashQuestions[flashIdx];
+  const opts={A:q.opt_a,B:q.opt_b,C:q.opt_c,D:q.opt_d};
+  const ca=q.correct_answer||'A';
+  document.getElementById('flash-answer').textContent=`${ca}: ${opts[ca]||''}`;
+  document.getElementById('flash-explanation').textContent=q.explanation||'';
+  document.getElementById('flash-reveal').className='flash-reveal show';
+  document.getElementById('flash-hint').style.display='none';
+  document.getElementById('flash-actions').style.display='flex';
+}
+
+async function flashAnswer(knew){
+  const q=flashQuestions[flashIdx];
+  await updateProgress(q.id,knew,progressMap[q.id]?.starred||false);
+  if(!stats[q.specialty])stats[q.specialty]={correct:0,total:0};
+  stats[q.specialty].total++;
+  if(knew){stats[q.specialty].correct++;profile.xp+=5;}
+  profile.lastDate=new Date().toDateString();
+  saveLocal();syncToCloud();
+  flashIdx++;
+  if(flashIdx<flashQuestions.length){
+    renderFlashCard();
+  }else{
+    showToast('🃏 ¡Flashcards completadas!');
+    showNav();openFlashPick();
+  }
+}
+
+// ══════════════════════════════════════
+//  SIMULACRO UNAL
+// ══════════════════════════════════════
+let simCfg={count:60,minutes:90};
+
+function openSimConfig(){
+  // Simple inline config via prompt (keep it light)
+  const n=parseInt(prompt('¿Cuántas preguntas? (30 / 60 / 90)','60'))||60;
+  const m=parseInt(prompt('¿Tiempo en minutos? (60 / 90 / 120)','90'))||90;
+  simCfg={count:Math.min(n,allQuestions.length),minutes:m};
+  startSim();
+}
+
+function startSim(){
+  simQuestions=shuffle([...allQuestions]).slice(0,simCfg.count);
+  simIdx=0;simAnswers=new Array(simCfg.count).fill(null);
+  simSeconds=simCfg.minutes*60;
+  renderSimQuestion();
+  showScreen('sim');hideNav();
+  // Start timer
+  clearInterval(simTimer);
+  simTimer=setInterval(()=>{
+    simSeconds--;
+    const m=Math.floor(simSeconds/60),s=simSeconds%60;
+    const el=document.getElementById('sim-timer');
+    el.textContent=`${m}:${s.toString().padStart(2,'0')}`;
+    el.className='sim-timer'+(simSeconds<=300?' urgent':'');
+    if(simSeconds<=0){clearInterval(simTimer);showSimResults();}
+  },1000);
+}
+
+function renderSimQuestion(){
+  const q=simQuestions[simIdx],total=simQuestions.length;
+  document.getElementById('sim-q-num').textContent=`Pregunta ${simIdx+1} de ${total}`;
+  document.getElementById('sim-spec-tag').textContent=`${specIcon(q.specialty)} ${q.specialty}`;
+  document.getElementById('sim-q-text').textContent=q.question||'';
+  document.getElementById('sim-prog').style.width=`${((simIdx+1)/total)*100}%`;
+  const opts=[{l:'A',t:q.opt_a||''},{l:'B',t:q.opt_b||''},{l:'C',t:q.opt_c||''},{l:'D',t:q.opt_d||''}].filter(o=>o.t.trim()!=='');
+  const saved=simAnswers[simIdx];
+  document.getElementById('sim-options').innerHTML=opts.map(o=>`
+    <button class="opt ${saved===o.l?'selected':''}" id="sopt-${o.l}" onclick="simSelect('${o.l}')">
+      <span class="opt-letter">${o.l}</span><span>${escapeHtml(o.t)}</span>
+    </button>`).join('');
+  const btn=document.getElementById('sim-action');
+  btn.textContent=simIdx+1<simQuestions.length?'Siguiente →':'Finalizar examen ✓';
+  // Prev button
+  const prevBtn=document.getElementById('sim-prev');
+  if(prevBtn)prevBtn.disabled=simIdx===0;
+  document.getElementById('screen-sim').scrollTo(0,0);
+}
+
+function simSelect(l){
+  simAnswers[simIdx]=l;
+  document.querySelectorAll('#sim-options .opt').forEach(el=>el.classList.remove('selected'));
+  const el=document.getElementById(`sopt-${l}`);if(el)el.classList.add('selected');
+}
+
+function simPrev(){
+  if(simIdx>0){simIdx--;renderSimQuestion();}
+}
+
+function simNext(){
+  if(simIdx+1<simQuestions.length){simIdx++;renderSimQuestion();}
+  else{
+    const unanswered=simAnswers.filter(a=>a===null).length;
+    if(unanswered>0){
+      if(!confirm(`Tienes ${unanswered} pregunta${unanswered!==1?'s':''} sin responder. ¿Finalizar de todas formas?`))return;
+    }
+    showSimResults();
+  }
+}
+
+async function showSimResults(){
+  clearInterval(simTimer);
+  let correct=0;
+  for(let i=0;i<simQuestions.length;i++){
+    const q=simQuestions[i];
+    const ca=(q.correct_answer||'A').toString().trim().toUpperCase();
+    const ans=simAnswers[i];
+    const isCorrect=ans===ca;
+    if(isCorrect)correct++;
+    if(ans!==null)await updateProgress(q.id,isCorrect,progressMap[q.id]?.starred||false);
+    if(!stats[q.specialty])stats[q.specialty]={correct:0,total:0};
+    if(ans!==null){stats[q.specialty].total++;if(isCorrect)stats[q.specialty].correct++;}
+  }
+  profile.xp+=correct*10;profile.lastDate=new Date().toDateString();
+  const pct=Math.round(correct/simQuestions.length*100);
+  sessions.unshift({date:new Date().toISOString(),specialties:[...new Set(simQuestions.map(q=>q.specialty))],score:correct,total:simQuestions.length,pct,mode:'simulacro'});
+  if(sessions.length>100)sessions=sessions.slice(0,100);
+  saveLocal();syncToCloud();
+  // Show results
+  examScore=correct;examQuestions=simQuestions;lastExamConfig={...simCfg,mode:'sim'};
+  showResultsScreen(correct,simQuestions.length,'Simulacro UNAL');
   showNav();
 }
 
-function retryExam() {
-  if (lastExamConfig) {
-    examConfig = JSON.parse(JSON.stringify(lastExamConfig));
-    startExam();
+// ══════════════════════════════════════
+//  RESULTS
+// ══════════════════════════════════════
+function showResults(){
+  const total=examQuestions.length;
+  const pct=total>0?Math.round(examScore/total*100):0;
+  const xpEarned=examScore*10+(pct===100?50:0);
+  sessions.unshift({date:new Date().toISOString(),specialties:[...new Set(examQuestions.map(q=>q.specialty))],score:examScore,total,pct,mode:lastExamConfig?.mode||'normal'});
+  if(sessions.length>100)sessions=sessions.slice(0,100);
+  saveLocal();syncToCloud();
+  showResultsScreen(examScore,total,'');
+  showNav();
+}
+
+function showResultsScreen(score,total,subtitle){
+  const pct=total>0?Math.round(score/total*100):0;
+  const xpEarned=score*10+(pct===100?50:0);
+  document.getElementById('sg-correct').textContent=score;
+  document.getElementById('sg-wrong').textContent=total-score;
+  document.getElementById('sg-total').textContent=total;
+  document.getElementById('xp-earned').textContent=`+${xpEarned} XP ganados`;
+  const emoji=pct>=90?'🏆':pct>=70?'🎯':pct>=50?'💪':'📚';
+  const title=pct>=90?'¡Excelente, Doctor!':pct>=70?'¡Buen trabajo!':pct>=50?'Vas bien':'A estudiar más';
+  document.getElementById('res-emoji').textContent=emoji;
+  document.getElementById('res-title').textContent=title;
+  document.getElementById('res-sub').textContent=subtitle||`${pct}% · ${total} preguntas`;
+  document.getElementById('ring-pct').textContent=pct+'%';
+  const circ=364.4;
+  setTimeout(()=>{document.getElementById('ring-fill').style.strokeDashoffset=circ-(pct/100*circ);},100);
+  showScreen('results');
+}
+
+function retryExam(){
+  if(lastExamConfig?.mode==='sim'){startSim();return;}
+  if(lastExamConfig){examConfig=JSON.parse(JSON.stringify(lastExamConfig));startExam();}
+}
+function confirmLeave(from){
+  if(confirm('¿Abandonar? El progreso se perderá.')){
+    if(from==='sim')clearInterval(simTimer);
+    showScreen('home');showNav();
   }
 }
 
-function confirmLeave() {
-  if (confirm('¿Abandonar el examen? Tu progreso se perderá.')) {
-    showScreen('home');
-    showNav();
-  }
+// ══════════════════════════════════════
+//  STATS
+// ══════════════════════════════════════
+function selectPeriod(p){
+  currentPeriod=p;
+  document.querySelectorAll('.period-tab').forEach(el=>el.classList.toggle('active',el.dataset.p===p));
+  renderStats();
 }
 
-// ─── STATS SCREEN ─────────────────────────────────────────
-function renderStats() {
-  const specs = [...new Set(allQuestions.map(q=>q.specialty))].sort();
-  const totalC = Object.values(stats).reduce((a,s)=>a+(s.correct||0),0);
-  const totalT = Object.values(stats).reduce((a,s)=>a+(s.total||0),0);
-  const overallPct = totalT > 0 ? Math.round(totalC/totalT*100) : 0;
+function renderStats(){
+  if(currentPeriod==='sessions'){renderSessionHistory();return;}
+  if(currentPeriod==='hard'){renderHardQuestions();return;}
 
-  let html = `
-    <div class="overall-card">
-      <div class="oc-top">
-        <div class="oc-title">Resumen global</div>
-        <div class="oc-total">${totalT} respuestas</div>
-      </div>
-      <div class="oc-stats">
-        <div class="oc-stat"><div class="oc-val" style="color:var(--correct)">${totalC}</div><div class="oc-lbl">Correctas</div></div>
-        <div class="oc-stat"><div class="oc-val" style="color:var(--wrong)">${totalT-totalC}</div><div class="oc-lbl">Incorrectas</div></div>
-        <div class="oc-stat"><div class="oc-val" style="color:var(--accent)">${overallPct}%</div><div class="oc-lbl">Acierto</div></div>
-      </div>
+  const specs=[...new Set(allQuestions.map(q=>q.specialty))].sort();
+  let filtSessions=sessions;
+  if(currentPeriod==='week')filtSessions=sessions.filter(s=>new Date(s.date)>=new Date(Date.now()-7*86400000));
+  if(currentPeriod==='month')filtSessions=sessions.filter(s=>new Date(s.date)>=new Date(Date.now()-30*86400000));
+
+  const totalC=Object.values(stats).reduce((a,s)=>a+(s.correct||0),0);
+  const totalT=Object.values(stats).reduce((a,s)=>a+(s.total||0),0);
+  const overallPct=totalT>0?Math.round(totalC/totalT*100):0;
+  const periodLabel=currentPeriod==='week'?'semanal':currentPeriod==='month'?'mensual':'global';
+
+  const due=getDueToday().length;
+
+  let html=`<div class="overall-card">
+    <div class="oc-top"><div class="oc-title">Resumen ${periodLabel}</div><div class="oc-total">${totalT} resp.</div></div>
+    <div class="oc-stats">
+      <div class="oc-stat"><div class="oc-val" style="color:var(--correct)">${totalC}</div><div class="oc-lbl">Correctas</div></div>
+      <div class="oc-stat"><div class="oc-val" style="color:var(--wrong)">${totalT-totalC}</div><div class="oc-lbl">Incorrectas</div></div>
+      <div class="oc-stat"><div class="oc-val" style="color:var(--accent)">${overallPct}%</div><div class="oc-lbl">Acierto</div></div>
+    </div>
+  </div>`;
+
+  if(due>0){
+    html+=`<div class="review-banner" onclick="startSRSReview()" style="cursor:pointer;">
+      <div class="rb-icon">🧠</div>
+      <div class="rb-info"><div class="rb-title">Repasar hoy</div><div class="rb-sub">Preguntas pendientes SRS</div></div>
+      <div class="rb-count">${due}</div>
     </div>`;
-
-  // Sort by accuracy ascending (weakest first)
-  const sorted = specs
-    .map(sp => ({ sp, st: stats[sp]||{correct:0,total:0} }))
-    .sort((a,b) => {
-      const pa = a.st.total>0 ? a.st.correct/a.st.total : 1;
-      const pb = b.st.total>0 ? b.st.correct/b.st.total : 1;
-      return pa - pb;
-    });
-
-  html += `<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;margin-top:4px;">Por especialidad · Más débil primero</div>`;
-
-  sorted.forEach(({sp, st}, i) => {
-    const pct = st.total > 0 ? Math.round(st.correct/st.total*100) : 0;
-    const color = pct>=70?'var(--correct)':pct>=50?'var(--warn)':'var(--wrong)';
-    const qCount = allQuestions.filter(q=>q.specialty===sp).length;
-    const isWeak = st.total >= 5 && pct < 60;
-    html += `
-      <div class="spec-stat-item">
-        <div class="ssi-top">
-          <div class="ssi-name">${specIcon(sp)} ${escapeHtml(sp)} ${isWeak?'<span class="weak-badge">Débil</span>':''}</div>
-          <div class="ssi-pct" style="color:${color}">${st.total>0?pct+'%':'Sin datos'}</div>
-        </div>
-        <div class="ssi-bar"><div class="ssi-fill" style="width:${pct}%;background:${color}"></div></div>
-        <div class="ssi-meta">
-          <span>${st.correct} correctas de ${st.total}</span>
-          <span>${qCount} preguntas disponibles</span>
-        </div>
-      </div>`;
-  });
-
-  document.getElementById('stats-body').innerHTML = html;
-}
-
-// ─── ADMIN ────────────────────────────────────────────────
-function renderAdminSpecSelect() {
-  const specs = [...new Set(allQuestions.map(q=>q.specialty))].sort();
-  const sel = document.getElementById('af-specialty');
-  sel.innerHTML = '<option value="">Selecciona especialidad…</option>' +
-    specs.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
-}
-
-function selectCorrect(l) {
-  selectedCorrect = l;
-  document.querySelectorAll('.correct-opt').forEach(el => {
-    el.classList.toggle('active', el.dataset.l === l);
-  });
-}
-
-async function saveQuestion() {
-  const specialty = document.getElementById('af-new-specialty').value.trim() ||
-                    document.getElementById('af-specialty').value;
-  const question  = document.getElementById('af-question').value.trim();
-  const opt_a     = document.getElementById('af-optA').value.trim();
-  const opt_b     = document.getElementById('af-optB').value.trim();
-  const opt_c     = document.getElementById('af-optC').value.trim();
-  const opt_d     = document.getElementById('af-optD').value.trim();
-  const explanation = document.getElementById('af-explanation').value.trim();
-  const source    = document.getElementById('af-source').value.trim();
-
-  if (!specialty || !question || !opt_a || !opt_b) {
-    showToast('⚠️ Completa especialidad, pregunta y al menos A y B'); return;
   }
 
-  const newQ = { specialty, question, opt_a, opt_b, opt_c, opt_d,
-                 correct_answer: selectedCorrect, explanation, source };
-  try {
-    const saved = await supa.insert('questions', newQ);
-    allQuestions.push(saved[0] || newQ);
-    showToast('✅ Pregunta guardada exitosamente');
-    // Clear form
-    ['af-question','af-optA','af-optB','af-optC','af-optD','af-explanation','af-source','af-new-specialty']
-      .forEach(id => { document.getElementById(id).value = ''; });
-    document.getElementById('af-specialty').value = '';
-    selectCorrect('A');
-    renderHome();
-    renderAdminSpecSelect();
-    renderSpecCheckList();
-  } catch(e) {
-    showToast('❌ Error: ' + (e.message || 'Verifica la tabla questions en Supabase'));
-  }
-}
-
-// ─── NAVIGATION ───────────────────────────────────────────
-const NAV_SCREENS = { home:'home', config:'config', stats:'stats', admin:'admin' };
-
-function navTo(key) {
-  if (key === 'stats') renderStats();
-  if (key === 'config') renderSpecCheckList();
-  showScreen(key);
-  navHighlight(key);
-}
-
-function navHighlight(key) {
-  document.querySelectorAll('.nav-item').forEach(el => {
-    el.classList.toggle('active', el.id === `nav-${key}`);
+  html+=`<div class="section-sub-hdr">Por especialidad · Más débil primero</div>`;
+  const sorted=specs.map(sp=>({sp,st:stats[sp]||{correct:0,total:0}}))
+    .sort((a,b)=>(a.st.total>0?a.st.correct/a.st.total:1)-(b.st.total>0?b.st.correct/b.st.total:1));
+  const today=new Date().toISOString().split('T')[0];
+  sorted.forEach(({sp,st})=>{
+    const pct=st.total>0?Math.round(st.correct/st.total*100):0;
+    const color=pct>=70?'var(--correct)':pct>=50?'var(--warn)':'var(--wrong)';
+    const qCount=allQuestions.filter(q=>q.specialty===sp).length;
+    const isWeak=st.total>=5&&pct<60;
+    // SRS due for this specialty
+    const dueCount=allQuestions.filter(q=>{
+      if(q.specialty!==sp)return false;
+      const p=progressMap[q.id];
+      return !p||p.next_review<=today;
+    }).length;
+    const srsTag=dueCount>0?`<span style="background:rgba(0,153,255,.15);border:1px solid rgba(0,153,255,.3);border-radius:6px;padding:2px 7px;font-size:10px;font-weight:700;color:var(--accent2);">🧠 ${dueCount} hoy</span>`:'';
+    html+=`<div class="spec-stat-item">
+      <div class="ssi-top">
+        <div class="ssi-name" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${specIcon(sp)} ${escapeHtml(sp)} ${isWeak?'<span class="weak-badge">Débil</span>':''} ${srsTag}</div>
+        <div class="ssi-pct" style="color:${color}">${st.total>0?pct+'%':'—'}</div>
+      </div>
+      <div class="ssi-bar"><div class="ssi-fill" style="width:${pct}%;background:${color}"></div></div>
+      <div class="ssi-meta"><span>${st.correct}/${st.total} respondidas</span><span>${qCount} disponibles</span></div>
+    </div>`;
   });
+  document.getElementById('stats-body').innerHTML=html;
 }
 
-function showScreen(name) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  const sc = document.getElementById(`screen-${name}`);
-  if (sc) { sc.classList.add('active'); sc.scrollTo(0,0); }
+function renderSessionHistory(){
+  if(sessions.length===0){
+    document.getElementById('stats-body').innerHTML='<div class="empty-state"><div class="es-icon">📋</div><p>Aún no has completado ningún examen.</p></div>';return;
+  }
+  document.getElementById('stats-body').innerHTML=sessions.map(s=>{
+    const d=new Date(s.date);
+    const dateStr=d.toLocaleDateString('es-CO',{day:'numeric',month:'short'});
+    const timeStr=d.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+    const emoji=s.pct>=90?'🏆':s.pct>=70?'🎯':s.pct>=50?'💪':'📚';
+    const pc=s.pct>=70?'var(--correct)':s.pct>=50?'var(--warn)':'var(--wrong)';
+    const modeIcon=s.mode==='simulacro'?'🏥':s.mode==='srs'?'🧠':'📝';
+    const specs=(s.specialties||[]).slice(0,2).join(', ')+((s.specialties||[]).length>2?` +${s.specialties.length-2}`:'');
+    return `<div class="session-card">
+      <div class="sess-icon">${emoji}</div>
+      <div class="sess-info"><div class="sess-title">${specs||'Examen'}</div><div class="sess-meta">${dateStr} · ${timeStr} · ${modeIcon}</div></div>
+      <div class="sess-score"><div class="sess-pct" style="color:${pc}">${s.pct}%</div><div class="sess-qs">${s.score}/${s.total}</div></div>
+    </div>`;
+  }).join('');
 }
 
-function hideNav() { document.getElementById('bottom-nav').style.display='none'; }
-function showNav()  { document.getElementById('bottom-nav').style.display='flex'; }
-function hideLoading() { document.getElementById('loading').style.display='none'; }
-
-// ─── XP POPUP ─────────────────────────────────────────────
-function spawnXP(text, anchor) {
-  const el = document.createElement('div');
-  el.className = 'xp-popup';
-  el.textContent = text;
-  const rect = anchor ? anchor.getBoundingClientRect() : {top:200,left:window.innerWidth/2};
-  el.style.left = (rect.left + rect.width/2 - 30) + 'px';
-  el.style.top  = (rect.top - 10) + 'px';
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 1300);
+function renderHardQuestions(){
+  const hard=allQuestions.filter(q=>{
+    const p=progressMap[q.id];
+    return p&&(p.starred||(p.wrong>p.correct&&p.wrong>=2));
+  }).sort((a,b)=>{
+    const pa=progressMap[a.id],pb=progressMap[b.id];
+    return (pb?.wrong||0)-(pa?.wrong||0);
+  });
+  if(hard.length===0){
+    document.getElementById('stats-body').innerHTML='<div class="empty-state"><div class="es-icon">⭐</div><p>Aún no tienes preguntas marcadas como difíciles.<br>Marca con ⭐ durante el examen.</p></div>';return;
+  }
+  document.getElementById('stats-body').innerHTML=hard.map(q=>{
+    const p=progressMap[q.id]||{};
+    const total=(p.correct||0)+(p.wrong||0);
+    const pct=total>0?Math.round((p.correct||0)/total*100):0;
+    const color=pct>=70?'var(--correct)':pct>=50?'var(--warn)':'var(--wrong)';
+    return `<div class="hard-q-item">
+      <div class="hq-top">
+        <div class="hq-text">${escapeHtml((q.question||'').substring(0,120))}${q.question?.length>120?'…':''}</div>
+        <div class="hq-badge">${p.wrong||0} ✗</div>
+      </div>
+      <div class="hq-meta">${specIcon(q.specialty)} ${escapeHtml(q.specialty)} · ${pct}% acierto · ${p.starred?'⭐':''}</div>
+    </div>`;
+  }).join('');
 }
 
-// ─── TOAST ────────────────────────────────────────────────
+// ══════════════════════════════════════
+//  ADMIN — EDIT / DELETE
+// ══════════════════════════════════════
+let editingQId=null,selectedEditCorrect='A';
+
+function renderAdminSpecSelect(){
+  const specs=[...new Set(allQuestions.map(q=>q.specialty))].sort();
+  const sel=document.getElementById('af-specialty');
+  const editSel=document.getElementById('edit-specialty-filter');
+  const opts='<option value="">Selecciona…</option>'+specs.map(s=>`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+  if(sel)sel.innerHTML=opts;
+  if(editSel)editSel.innerHTML='<option value="">Filtrar por especialidad…</option>'+specs.map(s=>`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+}
+
+function loadEditList(){
+  const sp=document.getElementById('edit-specialty-filter').value;
+  const list=document.getElementById('edit-q-list');
+  if(!sp){list.innerHTML='';return;}
+  const qs=allQuestions.filter(q=>q.specialty===sp);
+  list.innerHTML=qs.map(q=>`
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 14px;">
+      <div style="font-size:13px;color:var(--text);line-height:1.5;margin-bottom:8px;">${escapeHtml((q.question||'').substring(0,100))}${(q.question||'').length>100?'…':''}</div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="startEdit(${q.id})" style="flex:1;background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.3);color:var(--accent);border-radius:10px;padding:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;">✏️ Editar</button>
+        <button onclick="deleteQuestion(${q.id})" style="flex:1;background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.3);color:var(--wrong);border-radius:10px;padding:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;">🗑 Eliminar</button>
+      </div>
+    </div>`).join('');
+}
+
+function startEdit(qId){
+  const q=allQuestions.find(q=>q.id===qId);if(!q)return;
+  editingQId=qId;
+  document.getElementById('edit-specialty').value=q.specialty||'';
+  document.getElementById('edit-question').value=q.question||'';
+  document.getElementById('edit-optA').value=q.opt_a||'';
+  document.getElementById('edit-optB').value=q.opt_b||'';
+  document.getElementById('edit-optC').value=q.opt_c||'';
+  document.getElementById('edit-optD').value=q.opt_d||'';
+  document.getElementById('edit-explanation').value=q.explanation||'';
+  selectedEditCorrect=q.correct_answer||'A';
+  document.querySelectorAll('#edit-modal .correct-opt').forEach(el=>el.classList.toggle('active',el.dataset.l===selectedEditCorrect));
+  document.getElementById('edit-modal').style.display='block';
+  document.getElementById('edit-modal').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function selectEditCorrect(l){
+  selectedEditCorrect=l;
+  document.querySelectorAll('#edit-modal .correct-opt').forEach(el=>el.classList.toggle('active',el.dataset.l===l));
+}
+
+function cancelEdit(){
+  editingQId=null;
+  document.getElementById('edit-modal').style.display='none';
+}
+
+async function saveEdit(){
+  if(!editingQId)return;
+  const updated={
+    specialty:document.getElementById('edit-specialty').value.trim(),
+    question:document.getElementById('edit-question').value.trim(),
+    opt_a:document.getElementById('edit-optA').value.trim(),
+    opt_b:document.getElementById('edit-optB').value.trim(),
+    opt_c:document.getElementById('edit-optC').value.trim(),
+    opt_d:document.getElementById('edit-optD').value.trim(),
+    correct_answer:selectedEditCorrect,
+    explanation:document.getElementById('edit-explanation').value.trim()
+  };
+  if(!updated.specialty||!updated.question){showToast('⚠️ Especialidad y enunciado son obligatorios');return;}
+  try{
+    await db.patch('questions',`id=eq.${editingQId}`,updated);
+    const idx=allQuestions.findIndex(q=>q.id===editingQId);
+    if(idx>=0)allQuestions[idx]={...allQuestions[idx],...updated};
+    showToast('✅ Pregunta actualizada');
+    cancelEdit();
+    loadEditList();
+    renderHome();renderSpecCheckList();renderAdminSpecSelect();
+  }catch(e){showToast('❌ Error: '+e.message);}
+}
+
+async function deleteQuestion(qId){
+  if(!confirm('¿Eliminar esta pregunta permanentemente?'))return;
+  try{
+    const r=await fetch(`${SUPA_URL}/rest/v1/questions?id=eq.${qId}`,{method:'DELETE',headers:H});
+    if(!r.ok)throw new Error(await r.text());
+    allQuestions=allQuestions.filter(q=>q.id!==qId);
+    showToast('🗑 Pregunta eliminada');
+    loadEditList();
+    renderHome();renderSpecCheckList();renderAdminSpecSelect();
+  }catch(e){showToast('❌ Error: '+e.message);}
+}
+async function saveQuestion(){
+  const specialty=document.getElementById('af-new-specialty').value.trim()||document.getElementById('af-specialty').value;
+  const question=document.getElementById('af-question').value.trim();
+  const opt_a=document.getElementById('af-optA').value.trim();
+  const opt_b=document.getElementById('af-optB').value.trim();
+  const opt_c=document.getElementById('af-optC').value.trim();
+  const opt_d=document.getElementById('af-optD').value.trim();
+  const explanation=document.getElementById('af-explanation').value.trim();
+  const source=document.getElementById('af-source').value.trim();
+  if(!specialty||!question||!opt_a||!opt_b){showToast('⚠️ Faltan datos obligatorios');return;}
+  try{
+    const saved=await db.post('questions',{specialty,question,opt_a,opt_b,opt_c,opt_d,correct_answer:selectedCorrect,explanation,source});
+    allQuestions.push(saved[0]||{specialty,question,opt_a,opt_b,opt_c,opt_d,correct_answer:selectedCorrect,explanation,source});
+    showToast('✅ Pregunta guardada');
+    ['af-question','af-optA','af-optB','af-optC','af-optD','af-explanation','af-source','af-new-specialty'].forEach(id=>{document.getElementById(id).value='';});
+    document.getElementById('af-specialty').value='';
+    selectCorrect('A');renderHome();renderAdminSpecSelect();renderSpecCheckList();
+  }catch(e){showToast('❌ Error: '+e.message);}
+}
+
+// ══════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════
+function navTo(key){
+  if(key==='stats')renderStats();
+  if(key==='config'&&examConfig.specialties.length===0)renderSpecCheckList();
+  if(key==='home')renderHome();
+  showScreen(key);navHighlight(key);
+}
+function navHighlight(key){document.querySelectorAll('.nav-item').forEach(el=>el.classList.toggle('active',el.id===`nav-${key}`));}
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const sc=document.getElementById(`screen-${name}`);
+  if(sc){sc.classList.add('active');sc.scrollTo(0,0);}
+}
+function hideNav(){document.getElementById('bottom-nav').style.display='none';}
+function showNav(){document.getElementById('bottom-nav').style.display='flex';}
+function hideLoading(){document.getElementById('loading').style.display='none';}
+
+// ══════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════
+function spawnXP(text,anchor){
+  const el=document.createElement('div');el.className='xp-popup';el.textContent=text;
+  const rect=anchor?anchor.getBoundingClientRect():{top:200,left:window.innerWidth/2};
+  el.style.left=(rect.left+rect.width/2-30)+'px';el.style.top=(rect.top-10)+'px';
+  document.body.appendChild(el);setTimeout(()=>el.remove(),1300);
+}
 let toastTimer;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
 }
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function escapeHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-// ─── UTILS ────────────────────────────────────────────────
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length-1; i>0; i--) {
-    const j = Math.floor(Math.random()*(i+1));
-    [a[i],a[j]] = [a[j],a[i]];
-  }
-  return a;
-}
-
-function escapeHtml(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-// ─── DEMO DATA ────────────────────────────────────────────
-function getDemoQuestions() {
-  return [
-    {id:1,specialty:'Medicina Interna',question:'Paciente de 65 años con HTA, DM2 y ERC estadio 3. ¿Cuál es el IECA de elección para nefroprotección?',opt_a:'Captopril',opt_b:'Enalapril',opt_c:'Ramipril',opt_d:'Lisinopril',correct_answer:'C',explanation:'El Ramipril tiene evidencia en estudios como HOPE para nefroprotección en DM2 con ERC estadio 3.'},
-    {id:2,specialty:'Medicina Interna',question:'Mujer de 45 años con fatiga, bradicardia y mixedema. TSH 85 mUI/L, T4L baja. ¿Diagnóstico?',opt_a:'Hipotiroidismo subclínico',opt_b:'Hipotiroidismo primario franco',opt_c:'Hipotiroidismo central',opt_d:'Síndrome del enfermo eutiroideo',correct_answer:'B',explanation:'TSH muy elevada + T4L baja + síntomas = hipotiroidismo primario franco.'},
-    {id:3,specialty:'Neurología',question:'Paciente con hemiparesia derecha, afasia de Broca y desviación de la mirada hacia la izquierda. ¿Arteria afectada?',opt_a:'ACM derecha',opt_b:'ACA izquierda',opt_c:'ACM izquierda',opt_d:'ACP izquierda',correct_answer:'C',explanation:'La ACM izquierda irriga el área de Broca, corteza motora y campos oculares frontales izquierdos.'},
-    {id:4,specialty:'Pediatría',question:'RN de 32 semanas con dificultad respiratoria, quejido, retracciones y Rx con vidrio esmerilado bilateral. ¿Diagnóstico?',opt_a:'Neumonía neonatal',opt_b:'Síndrome de aspiración meconial',opt_c:'Taquipnea transitoria del RN',opt_d:'Enfermedad de membrana hialina',correct_answer:'D',explanation:'La EMH por déficit de surfactante es clásica en prematuros <34 semanas.'},
-    {id:5,specialty:'Urgencias',question:'Paciente con hipotensión, taquicardia, venas yugulares distendidas y ruidos cardíacos apagados tras trauma torácico. ¿Diagnóstico?',opt_a:'Hemotórax masivo',opt_b:'Neumotórax a tensión',opt_c:'Taponamiento cardíaco',opt_d:'Contusión miocárdica',correct_answer:'C',explanation:'La tríada de Beck: hipotensión + ingurgitación yugular + ruidos apagados = taponamiento cardíaco.'},
-    {id:6,specialty:'Cardiología',question:'Hombre de 55 años con IAMCEST en V1-V4, Killip I, tiempo de evolución 90 min. ¿Manejo de reperfusión óptimo?',opt_a:'Trombolisis con alteplase',opt_b:'ICPP (angioplastia primaria) <90 min',opt_c:'Heparina IV + observación',opt_d:'CABG emergente',correct_answer:'B',explanation:'El IAMCEST con acceso a hemodinamia: ICPP <90 min es gold standard (ACC/AHA).'},
-    {id:7,specialty:'Ginecología',question:'Mujer de 28 años, G0, dismenorrea severa y masa ovárica de 5 cm con contenido denso ecogénico. ¿Diagnóstico más probable?',opt_a:'Quiste folicular',opt_b:'Endometrioma',opt_c:'Teratoma maduro',opt_d:'Cistoadenoma seroso',correct_answer:'B',explanation:'El endometrioma asocia endometriosis con quiste de contenido hemorrágico denso ("quiste de chocolate").'},
-    {id:8,specialty:'Neumología',question:'Paciente con derrame pleural exudativo, glucosa <60, pH <7.2 y LDH elevada. ¿Conducta?',opt_a:'Observación y antibióticos orales',opt_b:'Toracocentesis diagnóstica únicamente',opt_c:'Drenaje torácico urgente',opt_d:'Decorticación pulmonar inmediata',correct_answer:'C',explanation:'Derrame paraneumónico complicado: pH <7.2 o glucosa <60 indica drenaje obligatorio.'},
-  ];
-}
+function getDemoQ(){return[
+  {id:1,specialty:'Medicina Interna',question:'Paciente 65 años, HTA, DM2, ERC estadio 3. ¿IECA de elección para nefroprotección?',opt_a:'Captopril',opt_b:'Enalapril',opt_c:'Ramipril',opt_d:'Lisinopril',correct_answer:'C',explanation:'Ramipril tiene evidencia en HOPE para nefroprotección en DM2 con ERC.'},
+  {id:2,specialty:'Cardiología',question:'IAMCEST en V1-V4, Killip I, 90 min evolución. ¿Mejor estrategia de reperfusión?',opt_a:'Trombolisis alteplase',opt_b:'ICPP <90 min',opt_c:'Heparina IV',opt_d:'CABG emergente',correct_answer:'B',explanation:'ICPP <90 min es gold standard en IAMCEST con acceso a hemodinamia (ACC/AHA).'},
+  {id:3,specialty:'Neurología',question:'Hemiparesia derecha + afasia de Broca + desviación mirada izquierda. ¿Arteria afectada?',opt_a:'ACM derecha',opt_b:'ACA izquierda',opt_c:'ACM izquierda',opt_d:'ACP izquierda',correct_answer:'C',explanation:'ACM izquierda irriga área de Broca, corteza motora y campos oculares frontales.'},
+];}
 </script>
-
-<!--
-╔══════════════════════════════════════════════════════════════
-║  INSTRUCCIONES SUPABASE — Ejecuta en SQL Editor
-╠══════════════════════════════════════════════════════════════
-
--- 1. TABLA DE PREGUNTAS
-CREATE TABLE questions (
-  id              BIGSERIAL PRIMARY KEY,
-  specialty       TEXT NOT NULL,
-  question        TEXT NOT NULL,
-  opt_a           TEXT NOT NULL,
-  opt_b           TEXT NOT NULL,
-  opt_c           TEXT DEFAULT '',
-  opt_d           TEXT DEFAULT '',
-  correct_answer  CHAR(1) NOT NULL DEFAULT 'A',
-  explanation     TEXT DEFAULT '',
-  source          TEXT DEFAULT '',
-  created_at      TIMESTAMPTZ DEFAULT NOW()
-);
-
--- 2. Habilitar acceso público (Row Level Security)
-ALTER TABLE questions ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "public_read"  ON questions FOR SELECT USING (true);
-CREATE POLICY "public_write" ON questions FOR INSERT WITH CHECK (true);
-
--- 3. (Opcional) índice por especialidad para performance
-CREATE INDEX idx_questions_specialty ON questions(specialty);
-
-╚══════════════════════════════════════════════════════════════
--->
 </body>
 </html>
