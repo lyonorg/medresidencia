@@ -354,7 +354,7 @@ select.form-input{cursor:pointer;}
   <div id="review-banner-wrap"></div>
   <div class="section-hdr">Modos de estudio</div>
   <div class="quick-grid">
-    <div class="quick-card" onclick="openConfig('quick10')"><div class="qc-icon">⚡</div><div class="qc-title">Rápido</div><div class="qc-desc">10 preguntas random</div><div class="qc-badge">10</div></div>
+    <div class="quick-card" onclick="openConfig('quick5')"><div class="qc-icon">⚡</div><div class="qc-title">Rápido</div><div class="qc-desc">5 preguntas random</div><div class="qc-badge">5</div></div>
     <div class="quick-card" onclick="openConfig('weak')"><div class="qc-icon">💪</div><div class="qc-title">Mis débiles</div><div class="qc-desc">Donde más fallo</div></div>
     <div class="quick-card" onclick="openFlashPick()"><div class="qc-icon">🃏</div><div class="qc-title">Flashcard</div><div class="qc-desc">Ver y revelar</div></div>
     <div class="quick-card" onclick="openSimConfig()"><div class="qc-icon">🏥</div><div class="qc-title">Simulacro</div><div class="qc-desc">Examen UNAL real</div></div>
@@ -471,10 +471,7 @@ select.form-input{cursor:pointer;}
     <div class="options" id="sim-options"></div>
   </div>
   <div class="sim-bottom">
-    <div style="display:flex;gap:10px;">
-      <button class="btn-action secondary" id="sim-prev" onclick="simPrev()" style="flex:0 0 56px;padding:20px 0;font-size:20px;">←</button>
-      <button class="btn-action primary" id="sim-action" onclick="simNext()" style="flex:1;">Siguiente →</button>
-    </div>
+    <button class="btn-action primary" id="sim-action" onclick="simNext()">Siguiente →</button>
   </div>
 </div>
 
@@ -855,6 +852,7 @@ function renderHome(){
 // ══════════════════════════════════════
 function openConfig(type,specialty){
   const allSpecs=[...new Set(allQuestions.map(q=>q.specialty))];
+  if(type==='quick5'){examConfig={count:5,mode:'normal',specialties:[...allSpecs]};startExam();return;}
   if(type==='quick10'){examConfig={count:10,mode:'normal',specialties:[...allSpecs]};startExam();return;}
   if(type==='weak'){
     const weak=Object.entries(stats).filter(([,s])=>s.total>=3&&(s.correct/s.total)<.65).map(([sp])=>sp);
@@ -1008,12 +1006,9 @@ async function toggleStar(){
 // ══════════════════════════════════════
 function openFlashPick(){
   const specs=[...new Set(allQuestions.map(q=>q.specialty))].sort();
-  // Update total count
   const totalEl=document.getElementById('flash-all-count');
   if(totalEl)totalEl.textContent=`${allQuestions.length} preguntas`;
-  // Apply theme icon
   applyTheme();
-  // Build spec list
   const list=document.getElementById('flash-spec-pick-list');
   list.innerHTML=specs.map((sp,i)=>{
     const count=allQuestions.filter(q=>q.specialty===sp).length;
@@ -1034,6 +1029,7 @@ function openFlashPick(){
     </div>`;
   }).join('');
   showScreen('flash-pick');
+  showNav();               // ← nav siempre visible en el selector
   navHighlight('');
 }
 
@@ -1109,17 +1105,19 @@ function openSimConfig(){
 }
 
 function startSim(){
-  simQuestions=shuffle([...allQuestions]).slice(0,simCfg.count);
-  simIdx=0;simAnswers=new Array(simCfg.count).fill(null);
+  const pool=shuffle([...allQuestions]);
+  simQuestions=pool.slice(0,Math.min(simCfg.count,pool.length));
+  simIdx=0;
+  simAnswers=new Array(simQuestions.length).fill(null); // usar longitud real
   simSeconds=simCfg.minutes*60;
   renderSimQuestion();
   showScreen('sim');hideNav();
-  // Start timer
   clearInterval(simTimer);
   simTimer=setInterval(()=>{
     simSeconds--;
     const m=Math.floor(simSeconds/60),s=simSeconds%60;
     const el=document.getElementById('sim-timer');
+    if(!el)return;
     el.textContent=`${m}:${s.toString().padStart(2,'0')}`;
     el.className='sim-timer'+(simSeconds<=300?' urgent':'');
     if(simSeconds<=0){clearInterval(simTimer);showSimResults();}
@@ -1138,11 +1136,8 @@ function renderSimQuestion(){
     <button class="opt ${saved===o.l?'selected':''}" id="sopt-${o.l}" onclick="simSelect('${o.l}')">
       <span class="opt-letter">${o.l}</span><span>${escapeHtml(o.t)}</span>
     </button>`).join('');
-  const btn=document.getElementById('sim-action');
-  btn.textContent=simIdx+1<simQuestions.length?'Siguiente →':'Finalizar examen ✓';
-  // Prev button
-  const prevBtn=document.getElementById('sim-prev');
-  if(prevBtn)prevBtn.disabled=simIdx===0;
+  document.getElementById('sim-action').textContent=
+    simIdx+1<simQuestions.length?'Siguiente →':'Finalizar examen ✓';
   document.getElementById('screen-sim').scrollTo(0,0);
 }
 
@@ -1152,19 +1147,9 @@ function simSelect(l){
   const el=document.getElementById(`sopt-${l}`);if(el)el.classList.add('selected');
 }
 
-function simPrev(){
-  if(simIdx>0){simIdx--;renderSimQuestion();}
-}
-
 function simNext(){
   if(simIdx+1<simQuestions.length){simIdx++;renderSimQuestion();}
-  else{
-    const unanswered=simAnswers.filter(a=>a===null).length;
-    if(unanswered>0){
-      if(!confirm(`Tienes ${unanswered} pregunta${unanswered!==1?'s':''} sin responder. ¿Finalizar de todas formas?`))return;
-    }
-    showSimResults();
-  }
+  else{showSimResults();}
 }
 
 async function showSimResults(){
