@@ -88,18 +88,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);font-s
 .qc-badge{position:absolute;top:12px;right:12px;background:var(--accent);color:#000;border-radius:20px;padding:3px 8px;font-size:10px;font-weight:700;}
 
 /* SPECIALTY BRANCHES */
-.branch-group{padding:0 20px;margin-bottom:8px;}
-.branch-header{display:flex;align-items:center;gap:10px;padding:12px 0 8px;cursor:pointer;user-select:none;}
-.branch-icon{font-size:20px;}
-.branch-name{font-size:13px;font-weight:700;color:var(--text);flex:1;letter-spacing:.04em;text-transform:uppercase;}
-.branch-count{font-size:11px;color:var(--muted);background:var(--s2);border-radius:20px;padding:3px 8px;}
-.branch-chevron{font-size:12px;color:var(--muted);transition:transform .2s;}
-.branch-chevron.open{transform:rotate(90deg);}
-.branch-specs{display:flex;flex-direction:column;gap:8px;overflow:hidden;transition:max-height .3s ease;max-height:0;}
-.branch-specs.open{max-height:2000px;}
 
-.spec-row{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .18s;box-shadow:var(--shadow);}
-.spec-row:active{transform:scale(.98);}
 .sr-icon{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
 .sr-info{flex:1;min-width:0;}
 .sr-name{font-size:15px;font-weight:600;color:var(--text);}
@@ -500,8 +489,6 @@ select.form-input{cursor:pointer;}
     <div class="quick-card" onclick="openBiblioteca(null)"><div class="qc-icon">📚</div><div class="qc-title">Biblioteca</div><div class="qc-desc">Revisar preguntas y respuestas</div></div>
     <div class="quick-card" onclick="openSimConfig()"><div class="qc-icon">🏥</div><div class="qc-title">Simulacro</div><div class="qc-desc">Examen UNAL real</div></div>
   </div>
-  <div class="section-hdr">Por área de conocimiento</div>
-  <div id="home-spec-list"></div>
 </div>
 
 <!-- CONFIG -->
@@ -1137,71 +1124,7 @@ function renderHome(){
   }else{banner.innerHTML='';}
 
   // Render specialty branches
-  renderSpecBranches();
-}
-
-function renderSpecBranches(){
-  const container=document.getElementById('home-spec-list');
-  // Group specialties from allQuestions
-  const specsFromQ=[...new Set(allQuestions.map(q=>q.specialty))].sort();
-  
-  // Build branch groups
-  const branchGroups={};
-  specsFromQ.forEach(sp=>{
-    const {branch,icon,color}=getBranchForSpec(sp);
-    if(!branchGroups[branch])branchGroups[branch]={icon,color,specs:[]};
-    branchGroups[branch].specs.push(sp);
-  });
-
-  const branchOrder=['Ciencias Básicas','Medicina Interna','Cirugía y Especialidades Quirúrgicas','Pediatría y Ginecología','Urgencias y Cuidado Crítico','Salud Mental','Salud Pública y Epidemiología','Diagnóstico por Imágenes','Otras Especialidades'];
-  const orderedBranches=[];
-  branchOrder.forEach(b=>{if(branchGroups[b])orderedBranches.push([b,branchGroups[b]]);});
-  Object.entries(branchGroups).forEach(([b,g])=>{if(!branchOrder.includes(b))orderedBranches.push([b,g]);});
-
-  container.innerHTML=orderedBranches.map(([branchName,group],bi)=>{
-    const totalInBranch=group.specs.reduce((s,sp)=>s+(allQuestions.filter(q=>q.specialty===sp).length),0);
-    const totalAnswered=group.specs.reduce((s,sp)=>s+(stats[sp]?.total||0),0);
-    const totalCorrect=group.specs.reduce((s,sp)=>s+(stats[sp]?.correct||0),0);
-    const branchPct=totalAnswered>0?Math.round(totalCorrect/totalAnswered*100):0;
-
-    const specsHtml=group.specs.map((sp,i)=>{
-      const st=stats[sp]||{correct:0,total:0};
-      const p2=st.total>0?Math.round(st.correct/st.total*100):0;
-      const count=allQuestions.filter(q=>q.specialty===sp).length;
-      const isWeak=st.total>=5&&p2<60;
-      const isDone=st.total>=5&&p2>=80;
-      const badge=isWeak?'<span class="weak-badge">Débil</span>':isDone?'<span class="done-badge">✓</span>':'';
-      const pc=p2>=70?'var(--correct)':p2>=50?'var(--warn)':'var(--wrong)';
-      // Mastery count
-      const masteredInSpec=allQuestions.filter(q=>q.specialty===sp&&isDominated(progressMap[q.id])).length;
-      const masteryStr=masteredInSpec>0?` · ${masteredInSpec} dominadas`:'';
-      return `<div class="spec-row" onclick="openBiblioteca('${escapeHtml(sp)}')">
-        <div class="sr-icon" style="background:${group.color}22;">${specIcon(sp)}</div>
-        <div class="sr-info"><div class="sr-name">${escapeHtml(sp)} ${badge}</div><div class="sr-sub">${count} preg.${masteryStr}</div></div>
-        <div class="sr-progress"><div class="sr-pct" style="color:${pc}">${st.total>0?p2+'%':'—'}</div><div class="sr-bar"><div class="sr-fill" style="width:${p2}%;background:${pc}"></div></div></div>
-      </div>`;
-    }).join('');
-
-    // First branch open by default
-    const isOpen=bi===0?'open':'';
-
-    return `<div class="branch-group">
-      <div class="branch-header" onclick="toggleBranch(this)">
-        <span class="branch-icon">${group.icon}</span>
-        <span class="branch-name">${branchName}</span>
-        <span class="branch-count">${group.specs.length} áreas · ${totalAnswered>0?branchPct+'%':'—'}</span>
-        <span class="branch-chevron ${isOpen}">›</span>
-      </div>
-      <div class="branch-specs ${isOpen}">${specsHtml}</div>
-    </div>`;
-  }).join('');
-}
-
-function toggleBranch(headerEl){
-  const chevron=headerEl.querySelector('.branch-chevron');
-  const specs=headerEl.nextElementSibling;
-  chevron.classList.toggle('open');
-  specs.classList.toggle('open');
+  // branches removed - now in Biblioteca
 }
 
 // ══════════════════════════════════════
