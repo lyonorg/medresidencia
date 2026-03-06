@@ -195,38 +195,48 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);font-s
 
 /* FLASHCARD */
 /* BIBLIOTECA */
-#screen-biblioteca{background:var(--bg);overflow:hidden;padding-bottom:0!important;}
+#screen-biblioteca{background:var(--bg);overflow:hidden;padding-bottom:0!important;display:flex;flex-direction:column;}
 #screen-biblioteca .top-bar{flex-shrink:0;}
-.bib-tabs{flex-shrink:0;display:flex;gap:6px;padding:0 20px 12px;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none;}
+.bib-search-wrap{padding:0 20px 10px;flex-shrink:0;}
+.bib-search{width:100%;background:var(--s2);border:1.5px solid var(--border);border-radius:14px;padding:11px 16px;font-size:15px;color:var(--text);font-family:'Sora',sans-serif;outline:none;transition:border-color .15s;-webkit-appearance:none;box-sizing:border-box;}
+.bib-search:focus{border-color:var(--accent);}
+.bib-search::placeholder{color:var(--muted);}
+.bib-tabs-wrap{flex-shrink:0;display:flex;align-items:center;gap:4px;padding:0 12px 10px;}
+.bib-tab-arrow{flex-shrink:0;width:28px;height:28px;border-radius:50%;background:var(--s2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:var(--text2);transition:all .15s;user-select:none;line-height:1;}
+.bib-tab-arrow:hover{background:var(--border2);}
+.bib-tabs{flex:1;display:flex;gap:6px;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none;padding:2px 0;}
 .bib-tabs::-webkit-scrollbar{display:none;}
-.bib-tab{flex-shrink:0;background:var(--s2);border:1.5px solid var(--border);border-radius:100px;padding:8px 14px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.bib-tab{flex-shrink:0;background:var(--s2);border:1.5px solid var(--border);border-radius:100px;padding:7px 13px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap;}
 .bib-tab.active{background:rgba(0,212,170,.12);border-color:var(--accent);color:var(--accent);}
-.bib-list{flex:1;overflow-y:auto;padding:0 20px;display:flex;flex-direction:column;gap:10px;padding-bottom:calc(var(--nav-h) + 32px + env(safe-area-inset-bottom));}
-.bib-item{background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden;transition:border-color .2s;}
+.bib-toolbar{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 20px 8px;}
+.bib-count{font-size:12px;color:var(--muted);}
+.bib-pagination{display:flex;align-items:center;gap:6px;}
+.bib-page-btn{width:30px;height:30px;border-radius:9px;background:var(--s2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:var(--text2);transition:all .15s;}
+.bib-page-btn:hover:not([disabled]){background:var(--border2);}
+.bib-page-btn[disabled]{opacity:.3;cursor:default;pointer-events:none;}
+.bib-page-info{font-size:12px;color:var(--muted);min-width:56px;text-align:center;}
+.bib-list{flex:1;overflow-y:auto;padding:0 20px;display:flex;flex-direction:column;gap:8px;padding-bottom:calc(var(--nav-h) + 24px + env(safe-area-inset-bottom));}
+.bib-item{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .2s;}
 .bib-item.open{border-color:var(--accent2);}
-.bib-item-header{padding:16px 18px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;touch-action:manipulation;}
-.bib-num{flex-shrink:0;width:28px;height:28px;border-radius:8px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--muted);margin-top:2px;}
-.bib-q{font-family:'Playfair Display',serif;font-size:15px;line-height:1.55;color:var(--text);flex:1;}
-.bib-chevron{flex-shrink:0;font-size:16px;color:var(--muted);transition:transform .25s;margin-top:2px;}
+.bib-item-header{padding:13px 15px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none;}
+.bib-num{flex-shrink:0;width:22px;height:22px;border-radius:6px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--muted);margin-top:2px;}
+.bib-q{font-size:14px;line-height:1.5;color:var(--text);flex:1;}
+.bib-chevron{flex-shrink:0;font-size:16px;color:var(--muted);transition:transform .25s;margin-top:1px;}
 .bib-item.open .bib-chevron{transform:rotate(90deg);color:var(--accent2);}
-.bib-body{display:none;padding:0 18px 18px;border-top:1px solid var(--border);animation:panelIn .2s ease;}
+.bib-body{display:none;padding:0 15px 15px;border-top:1px solid var(--border);animation:panelIn .2s ease;}
 .bib-item.open .bib-body{display:block;}
-.bib-opts{display:flex;flex-direction:column;gap:6px;margin:14px 0;}
-.bib-opt{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--muted);line-height:1.5;padding:8px 12px;border-radius:10px;background:var(--s2);}
+.bib-opts{display:flex;flex-direction:column;gap:5px;margin:12px 0;}
+.bib-opt{display:flex;gap:9px;align-items:flex-start;font-size:13px;color:var(--muted);line-height:1.5;padding:7px 11px;border-radius:9px;background:var(--s2);}
 .bib-opt.is-correct{background:rgba(0,200,150,.1);color:var(--correct);font-weight:600;}
-.bib-opt-letter{flex-shrink:0;width:22px;height:22px;border-radius:6px;background:var(--s1);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+.bib-opt-letter{flex-shrink:0;width:20px;height:20px;border-radius:5px;background:var(--s1);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;}
 .bib-opt.is-correct .bib-opt-letter{background:var(--correct);color:#000;}
-.bib-explanation{font-size:13px;color:var(--text2);line-height:1.6;border-top:1px solid var(--border);padding-top:12px;margin-top:4px;}
-.bib-source{font-size:11px;color:var(--muted);margin-top:8px;font-style:italic;}
-.bib-mastery{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
-.bib-mastery-bar{flex:1;height:5px;background:var(--s2);border-radius:100px;overflow:hidden;}
+.bib-explanation{font-size:13px;color:var(--text2);line-height:1.6;border-top:1px solid var(--border);padding-top:10px;margin-top:4px;}
+.bib-source{font-size:11px;color:var(--muted);margin-top:6px;font-style:italic;}
+.bib-mastery{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid var(--border);}
+.bib-mastery-bar{flex:1;height:4px;background:var(--s2);border-radius:100px;overflow:hidden;}
 .bib-mastery-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--warn),var(--correct));}
 .bib-mastery-lbl{font-size:11px;color:var(--muted);white-space:nowrap;}
 .bib-empty{text-align:center;padding:40px 24px;color:var(--muted);font-size:14px;}
-.bib-search{margin:0 20px 12px;background:var(--s2);border:1.5px solid var(--border);border-radius:14px;padding:12px 16px;font-size:15px;color:var(--text);font-family:'Sora',sans-serif;outline:none;width:calc(100% - 40px);transition:border-color .15s;-webkit-appearance:none;}
-.bib-search:focus{border-color:var(--accent);}
-.bib-search::placeholder{color:var(--muted);}
-.bib-count{flex-shrink:0;font-size:12px;color:var(--muted);padding:0 20px 8px;}
 
 /* SIMULACRO */
 #screen-sim{background:var(--bg);}
@@ -553,9 +563,22 @@ select.form-input{cursor:pointer;}
     <div class="top-bar-title">📚 Biblioteca</div>
     <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn-bib">🌙</button>
   </div>
-  <input class="bib-search" id="bib-search" type="search" placeholder="🔍 Buscar pregunta…" oninput="bibSearch(this.value)"/>
-  <div class="bib-tabs" id="bib-tabs"></div>
-  <div class="bib-count" id="bib-count"></div>
+  <div class="bib-search-wrap">
+    <input class="bib-search" id="bib-search" type="search" placeholder="🔍 Buscar pregunta…" oninput="bibSearch(this.value)"/>
+  </div>
+  <div class="bib-tabs-wrap">
+    <div class="bib-tab-arrow" onclick="bibScrollTabs(-1)" title="Anterior">‹</div>
+    <div class="bib-tabs" id="bib-tabs"></div>
+    <div class="bib-tab-arrow" onclick="bibScrollTabs(1)" title="Siguiente">›</div>
+  </div>
+  <div class="bib-toolbar">
+    <div class="bib-count" id="bib-count"></div>
+    <div class="bib-pagination">
+      <div class="bib-page-btn" id="bib-prev" onclick="bibChangePage(-1)">‹</div>
+      <div class="bib-page-info" id="bib-page-info">1 / 1</div>
+      <div class="bib-page-btn" id="bib-next" onclick="bibChangePage(1)">›</div>
+    </div>
+  </div>
   <div class="bib-list" id="bib-list"></div>
 </div>
 
@@ -1361,14 +1384,19 @@ async function toggleStar(){
 // ══════════════════════════════════════
 let bibCurrentSpec='__all__';
 let bibSearchQuery='';
+let bibPage=0;
+const BIB_PER_PAGE=15;
+let bibPool=[];
 
 function openBiblioteca(specialty){
   bibCurrentSpec=specialty||'__all__';
   bibSearchQuery='';
+  bibPage=0;
   const searchEl=document.getElementById('bib-search');
   if(searchEl)searchEl.value='';
   renderBibTabs();
-  renderBibList();
+  bibBuildPool();
+  renderBibPage();
   applyTheme();
   showScreen('biblioteca');
   showNav();
@@ -1383,30 +1411,45 @@ function renderBibTabs(){
     const active=bibCurrentSpec===sp;
     return `<div class="bib-tab ${active?'active':''}" onclick="bibSelectSpec('${escapeHtml(sp)}')">${label} <span style="opacity:.6;font-size:11px;">${count}</span></div>`;
   }).join('');
+  // Scroll active tab into view
+  setTimeout(()=>{
+    const activeTab=document.querySelector('.bib-tab.active');
+    if(activeTab)activeTab.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  },50);
+}
+
+function bibScrollTabs(dir){
+  const tabs=document.getElementById('bib-tabs');
+  if(tabs)tabs.scrollBy({left:dir*180,behavior:'smooth'});
 }
 
 function bibSelectSpec(sp){
   bibCurrentSpec=sp;
   bibSearchQuery='';
+  bibPage=0;
   const searchEl=document.getElementById('bib-search');
   if(searchEl)searchEl.value='';
-  // Update tab highlight
   document.querySelectorAll('.bib-tab').forEach(el=>el.classList.remove('active'));
-  const tabs=document.querySelectorAll('.bib-tab');
   const specs=['__all__',...new Set(allQuestions.map(q=>q.specialty))].sort((a,b)=>a==='__all__'?-1:b==='__all__'?1:a.localeCompare(b));
+  const tabs=document.querySelectorAll('.bib-tab');
   const idx=specs.indexOf(sp);
-  if(tabs[idx])tabs[idx].classList.add('active');
-  // Scroll tab into view
-  if(tabs[idx])tabs[idx].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
-  renderBibList();
+  if(tabs[idx]){
+    tabs[idx].classList.add('active');
+    tabs[idx].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  }
+  bibBuildPool();
+  renderBibPage();
+  document.getElementById('bib-list').scrollTop=0;
 }
 
 function bibSearch(q){
   bibSearchQuery=q.toLowerCase();
-  renderBibList();
+  bibPage=0;
+  bibBuildPool();
+  renderBibPage();
 }
 
-function renderBibList(){
+function bibBuildPool(){
   let pool=bibCurrentSpec==='__all__'?[...allQuestions]:allQuestions.filter(q=>q.specialty===bibCurrentSpec);
   if(bibSearchQuery){
     pool=pool.filter(q=>
@@ -1416,15 +1459,34 @@ function renderBibList(){
       (q.explanation||'').toLowerCase().includes(bibSearchQuery)
     );
   }
+  bibPool=pool;
+}
 
-  document.getElementById('bib-count').textContent=`${pool.length} pregunta${pool.length!==1?'s':''}`;
+function bibChangePage(dir){
+  const maxPage=Math.ceil(bibPool.length/BIB_PER_PAGE)-1;
+  bibPage=Math.max(0,Math.min(maxPage,bibPage+dir));
+  renderBibPage();
+  document.getElementById('bib-list').scrollTop=0;
+}
 
-  if(pool.length===0){
-    document.getElementById('bib-list').innerHTML=`<div class="bib-empty">🔍 Sin resultados para "${escapeHtml(bibSearchQuery)}"</div>`;
+function renderBibPage(){
+  const total=bibPool.length;
+  const totalPages=Math.max(1,Math.ceil(total/BIB_PER_PAGE));
+  const start=bibPage*BIB_PER_PAGE;
+  const pageItems=bibPool.slice(start,start+BIB_PER_PAGE);
+
+  document.getElementById('bib-count').textContent=`${total} pregunta${total!==1?'s':''}`;
+  document.getElementById('bib-page-info').textContent=`${bibPage+1} / ${totalPages}`;
+  document.getElementById('bib-prev').toggleAttribute('disabled',bibPage===0);
+  document.getElementById('bib-next').toggleAttribute('disabled',bibPage>=totalPages-1);
+
+  if(total===0){
+    document.getElementById('bib-list').innerHTML=`<div class="bib-empty">🔍 Sin resultados${bibSearchQuery?' para "'+escapeHtml(bibSearchQuery)+'"':''}</div>`;
     return;
   }
 
-  document.getElementById('bib-list').innerHTML=pool.map((q,i)=>{
+  document.getElementById('bib-list').innerHTML=pageItems.map((q,i)=>{
+    const globalIdx=start+i;
     const opts=['A','B','C','D'];
     const ca=(q.correct_answer||'A').toString().trim().toUpperCase();
     const prog=progressMap[q.id];
@@ -1436,21 +1498,18 @@ function renderBibList(){
       const txt=q[`opt_${l.toLowerCase()}`]||'';
       if(!txt.trim())return '';
       const isCorrect=l===ca;
-      return `<div class="bib-opt ${isCorrect?'is-correct':''}">
-        <div class="bib-opt-letter">${l}</div>
-        <div>${escapeHtml(txt)}</div>
-      </div>`;
+      return `<div class="bib-opt ${isCorrect?'is-correct':''}"><div class="bib-opt-letter">${l}</div><div>${escapeHtml(txt)}</div></div>`;
     }).join('');
 
     const masteryHtml=totalAtt>0?`
       <div class="bib-mastery">
         <div class="bib-mastery-bar"><div class="bib-mastery-fill" style="width:${mastPct}%"></div></div>
         <span class="bib-mastery-lbl">${dominated?'✅ Dominada':`${mastPct}% · ${totalAtt} intentos`}</span>
-      </div>`:'<div style="font-size:11px;color:var(--muted);margin-top:10px;">Sin intentos aún</div>';
+      </div>`:'';
 
     return `<div class="bib-item" id="bib-${q.id}">
       <div class="bib-item-header" onclick="bibToggle(${q.id})">
-        <div class="bib-num">${i+1}</div>
+        <div class="bib-num">${globalIdx+1}</div>
         <div class="bib-q">${escapeHtml(q.question||'')}</div>
         <div class="bib-chevron">›</div>
       </div>
@@ -1469,12 +1528,9 @@ function bibToggle(qId){
   const el=document.getElementById(`bib-${qId}`);
   if(!el)return;
   const wasOpen=el.classList.contains('open');
-  // Cerrar todos los abiertos
   document.querySelectorAll('.bib-item.open').forEach(e=>e.classList.remove('open'));
-  // Abrir este si estaba cerrado
   if(!wasOpen){
     el.classList.add('open');
-    // Smooth scroll to show the item
     setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
   }
 }
