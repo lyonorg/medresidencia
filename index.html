@@ -238,7 +238,7 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);font-s
 .modal-btn-start{flex:2;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;border:none;border-radius:16px;padding:17px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;}
 
 /* RESULTS */
-#screen-results{background:radial-gradient(ellipse 80% 40% at 50% 0%,#082040,var(--bg) 60%);align-items:center;padding:44px 20px 20px;gap:0;}
+#screen-results{background:radial-gradient(ellipse 80% 40% at 50% 0%,#082040,var(--bg) 60%);align-items:center;padding:44px 20px calc(20px + var(--nav-h) + env(safe-area-inset-bottom));gap:0;overflow-y:auto;}
 [data-theme="light"] #screen-results{background:radial-gradient(ellipse 80% 40% at 50% 0%,#c8d8f8,var(--bg) 60%);}
 .result-emoji{font-size:64px;text-align:center;margin-bottom:10px;animation:bounceIn .5s cubic-bezier(.34,1.56,.64,1);}
 @keyframes bounceIn{from{transform:scale(0);}to{transform:scale(1);}}
@@ -282,7 +282,11 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);font-s
 
 /* STATS */
 #screen-stats{background:var(--bg);}
-.period-tabs{display:flex;gap:6px;padding:0 20px 14px;overflow-x:auto;}
+/* Stats sticky header */
+#screen-stats .top-bar{position:sticky;top:0;z-index:50;background:var(--bg);padding-bottom:8px;}
+#screen-stats .period-tabs{position:sticky;top:88px;z-index:49;background:var(--bg);padding-top:4px;padding-bottom:12px;}
+.period-tabs{display:flex;gap:6px;padding:0 20px 14px;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none;}
+.period-tabs::-webkit-scrollbar{display:none;}
 .period-tab{flex-shrink:0;background:var(--s2);border:1.5px solid var(--border);border-radius:100px;padding:9px 14px;text-align:center;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;}
 .period-tab.active{background:rgba(0,212,170,.12);border-color:var(--accent);color:var(--accent);}
 .stats-body{padding:0 20px;display:flex;flex-direction:column;gap:12px;}
@@ -834,6 +838,7 @@ function getLevel(xp){return LEVELS.find(l=>xp>=l.min&&xp<l.max)||LEVELS[LEVELS.
 // ══════════════════════════════════════
 let allQuestions=[],progressMap={};
 let examQuestions=[],examIdx=0,examScore=0;
+let hearts=999;
 let examConfig={count:10,mode:'normal',specialties:[]};
 let lastExamConfig=null;
 let stats={},profile={xp:0,streak:0,lastDate:null,name:''},sessions=[];
@@ -879,7 +884,7 @@ window.onload=async()=>{
     await loadProgress();
     await loadCloudStats();
   }catch(e){
-    allQuestions=getDemoQ();
+    allQuestions=getDemoQ().map(q=>({...q,specialty:normalizeSpec(q.specialty)}));
     showToast('📦 Modo demo — sin conexión');
   }
   renderHome();renderSpecCheckList();renderAdminSpecSelect();
@@ -1296,10 +1301,8 @@ async function selectOpt(letter){
     if(l===correct)el.classList.add('correct');
     else if(l===letter&&!isCorrect)el.classList.add('wrong');
   });
-  // Track for post-exam review
-  if(!isCorrect){
-    lastExamWrong.push({q,userAnswer:letter,correctAnswer:correct});
-  }
+  // Track ALL questions for post-exam review
+  lastExamWrong.push({q,userAnswer:letter,correctAnswer:correct,wasCorrect:isCorrect});
   // Stats
   if(!stats[q.specialty])stats[q.specialty]={correct:0,total:0};
   stats[q.specialty].total++;
@@ -1343,9 +1346,6 @@ function renderHearts(){
   if(hearts>=999){document.getElementById('hearts-row').innerHTML='';return;}
   document.getElementById('hearts-row').innerHTML=Array.from({length:5},(_,i)=>`<span class="heart ${i>=hearts?'lost':''}">❤️</span>`).join('');
 }
-// hearts var
-let hearts=999;
-
 async function toggleStar(){
   const q=examQuestions[examIdx];
   currentStarred=!currentStarred;
@@ -1513,26 +1513,33 @@ function simNext(){
 async function showSimResults(){
   clearInterval(simTimer);
   let correct=0;
+  // lastExamWrong stores ALL questions with result, for full review
   lastExamWrong=[];
   for(let i=0;i<simQuestions.length;i++){
     const q=simQuestions[i];
     const ca=(q.correct_answer||'A').toString().trim().toUpperCase();
     const ans=simAnswers[i];
-    const isCorrect=ans===ca;
+    const answered=ans!==null;
+    const isCorrect=answered&&ans===ca;
     if(isCorrect)correct++;
-    else if(ans!==null)lastExamWrong.push({q,userAnswer:ans,correctAnswer:ca});
-    if(ans!==null)await updateProgress(q.id,isCorrect,progressMap[q.id]?.starred||false);
+    // Track ALL answered questions for review (both correct and wrong)
+    if(answered){
+      lastExamWrong.push({q,userAnswer:ans,correctAnswer:ca,wasCorrect:isCorrect});
+    }
+    if(answered)await updateProgress(q.id,isCorrect,progressMap[q.id]?.starred||false);
     if(!stats[q.specialty])stats[q.specialty]={correct:0,total:0};
-    if(ans!==null){stats[q.specialty].total++;if(isCorrect)stats[q.specialty].correct++;}
+    if(answered){stats[q.specialty].total++;if(isCorrect)stats[q.specialty].correct++;}
   }
   profile.xp+=correct*10;profile.lastDate=new Date().toDateString();
   trackActivity(simQuestions.length);
-  const pct=Math.round(correct/simQuestions.length*100);
+  const answered=simAnswers.filter(a=>a!==null).length;
+  const wrong=answered-correct;
+  const pct=answered>0?Math.round(correct/answered*100):0;
   sessions.unshift({date:new Date().toISOString(),specialties:[...new Set(simQuestions.map(q=>q.specialty))],score:correct,total:simQuestions.length,pct,mode:'simulacro'});
   if(sessions.length>100)sessions=sessions.slice(0,100);
   saveLocal();syncToCloud();
   examScore=correct;examQuestions=simQuestions;lastExamConfig={...simCfg,mode:'sim'};
-  showResultsScreen(correct,simQuestions.length,'Simulacro UNAL');
+  showResultsScreen(correct,simQuestions.length,'Simulacro UNAL',wrong);
   showNav();
 }
 
@@ -1542,18 +1549,20 @@ async function showSimResults(){
 function showResults(){
   const total=examQuestions.length;
   const pct=total>0?Math.round(examScore/total*100):0;
+  const wrong=total-examScore;
   sessions.unshift({date:new Date().toISOString(),specialties:[...new Set(examQuestions.map(q=>q.specialty))],score:examScore,total,pct,mode:lastExamConfig?.mode||'normal'});
   if(sessions.length>100)sessions=sessions.slice(0,100);
   saveLocal();syncToCloud();
-  showResultsScreen(examScore,total,'');
+  showResultsScreen(examScore,total,'',wrong);
   showNav();
 }
 
-function showResultsScreen(score,total,subtitle){
+function showResultsScreen(score,total,subtitle,wrongCount){
   const pct=total>0?Math.round(score/total*100):0;
   const xpEarned=score*10+(pct===100?50:0);
+  const wrong=wrongCount!==undefined?wrongCount:total-score;
   document.getElementById('sg-correct').textContent=score;
-  document.getElementById('sg-wrong').textContent=total-score;
+  document.getElementById('sg-wrong').textContent=wrong;
   document.getElementById('sg-total').textContent=total;
   document.getElementById('xp-earned').textContent=`+${xpEarned} XP ganados`;
   const emoji=pct>=90?'🏆':pct>=70?'🎯':pct>=50?'💪':'📚';
@@ -1564,31 +1573,43 @@ function showResultsScreen(score,total,subtitle){
   document.getElementById('ring-pct').textContent=pct+'%';
   const circ=364.4;
   setTimeout(()=>{document.getElementById('ring-fill').style.strokeDashoffset=circ-(pct/100*circ);},100);
-  // Show review button only if there are wrong answers
+  // Review button: show if there are any answered questions to review
   const reviewBtn=document.getElementById('btn-review-failed');
-  if(lastExamWrong.length>0){
+  const reviewCount=lastExamWrong.length;
+  if(reviewCount>0){
     reviewBtn.style.display='block';
-    reviewBtn.textContent=`📋 Revisar ${lastExamWrong.length} errores`;
+    const wrongOnly=lastExamWrong.filter(x=>!x.wasCorrect).length;
+    reviewBtn.textContent=wrongOnly>0?`📋 Revisar examen (${wrongOnly} errores)`:`📋 Revisar examen`;
   }else{reviewBtn.style.display='none';}
   showScreen('results');
 }
 
 // POST-EXAM REVIEW
 function openPostExamReview(){
-  if(lastExamWrong.length===0){showToast('✅ ¡Sin errores!');return;}
-  document.getElementById('review-count-label').textContent=`${lastExamWrong.length} pregunta${lastExamWrong.length!==1?'s':''} fallada${lastExamWrong.length!==1?'s':''}`;
+  if(lastExamWrong.length===0){showToast('✅ Sin preguntas para revisar');return;}
+  const wrongOnly=lastExamWrong.filter(x=>!x.wasCorrect).length;
+  document.getElementById('review-count-label').textContent=
+    `${lastExamWrong.length} preguntas · ${wrongOnly} error${wrongOnly!==1?'es':''} · ${lastExamWrong.length-wrongOnly} correctas`;
   const list=document.getElementById('review-list');
-  list.innerHTML=lastExamWrong.map(({q,userAnswer,correctAnswer})=>{
+  list.innerHTML=lastExamWrong.map(({q,userAnswer,correctAnswer,wasCorrect})=>{
     const opts=['A','B','C','D'].map(l=>{
       const txt=q[`opt_${l.toLowerCase()}`]||'';
       if(!txt.trim())return '';
       const isCorrect=l===correctAnswer;
-      const isUserWrong=l===userAnswer&&userAnswer!==correctAnswer;
+      const isUserWrong=l===userAnswer&&!wasCorrect;
+      const isUserCorrect=l===userAnswer&&wasCorrect;
       const cls=isCorrect?'review-opt correct-ans':isUserWrong?'review-opt user-wrong':'review-opt';
-      return `<div class="${cls}"><div class="review-opt-letter">${l}</div><div>${escapeHtml(txt)}</div></div>`;
+      const extra=isUserCorrect?' style="font-weight:700;color:var(--correct)"':'';
+      return `<div class="${cls}"${extra}><div class="review-opt-letter">${l}</div><div>${escapeHtml(txt)}</div></div>`;
     }).join('');
-    return `<div class="review-item">
-      <div class="review-spec">${specIcon(q.specialty)} ${escapeHtml(q.specialty)}</div>
+    const headerColor=wasCorrect?'var(--correct)':'var(--wrong)';
+    const headerIcon=wasCorrect?'✅':'❌';
+    return `<div class="review-item" style="border-color:${wasCorrect?'rgba(0,200,150,.25)':'rgba(255,71,87,.2)'};">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="font-size:16px;">${headerIcon}</span>
+        <span style="font-size:11px;font-weight:700;color:${headerColor};text-transform:uppercase;letter-spacing:.05em;">${wasCorrect?'Correcta':'Incorrecta'}</span>
+        <span class="review-spec" style="margin:0;margin-left:auto;">${specIcon(q.specialty)} ${escapeHtml(q.specialty)}</span>
+      </div>
       <div class="review-item-q">${escapeHtml(q.question||'')}</div>
       <div class="review-item-opts">${opts}</div>
       ${q.explanation?`<div class="review-explanation">💡 ${escapeHtml(q.explanation)}</div>`:''}
@@ -1604,7 +1625,7 @@ function retryExam(){
 function confirmLeave(from){
   if(confirm('¿Abandonar? El progreso se perderá.')){
     if(from==='sim')clearInterval(simTimer);
-    showScreen('home');showNav();
+    navTo('home');
   }
 }
 
@@ -1872,6 +1893,7 @@ function navTo(key){
   if(key==='stats')renderStats();
   if(key==='config'&&examConfig.specialties.length===0)renderSpecCheckList();
   if(key==='home')renderHome();
+  if(key==='results'){showScreen('results');return;} // results no tiene nav-item, no llamar navHighlight
   showScreen(key);navHighlight(key);showNav();
 }
 function navHighlight(key){document.querySelectorAll('.nav-item').forEach(el=>el.classList.toggle('active',el.id===`nav-${key}`));}
