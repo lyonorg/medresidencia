@@ -282,9 +282,12 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);font-s
 
 /* STATS */
 #screen-stats{background:var(--bg);}
-/* Stats sticky header */
-#screen-stats .top-bar{position:sticky;top:0;z-index:50;background:var(--bg);padding-bottom:8px;}
-#screen-stats .period-tabs{position:sticky;top:88px;z-index:49;background:var(--bg);padding-top:4px;padding-bottom:12px;}
+/* Stats sticky header - sticky inside overflow:auto requiere position:sticky en el elemento directo del scroll */
+#screen-stats .top-bar{flex-shrink:0;}
+#screen-stats .period-tabs{flex-shrink:0;}
+#screen-stats .stats-body{flex:1;overflow-y:auto;padding-bottom:calc(var(--nav-h) + 32px + env(safe-area-inset-bottom));}
+/* Hacer que stats NO haga scroll en el screen sino en stats-body */
+#screen-stats{overflow:hidden;padding-bottom:0!important;}
 .period-tabs{display:flex;gap:6px;padding:0 20px 14px;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none;}
 .period-tabs::-webkit-scrollbar{display:none;}
 .period-tab{flex-shrink:0;background:var(--s2);border:1.5px solid var(--border);border-radius:100px;padding:9px 14px;text-align:center;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;}
@@ -1223,7 +1226,8 @@ function startSRSReview(){
 function renderSpecCheckList(preselect){
   const specs=[...new Set(allQuestions.map(q=>q.specialty))].sort();
   const allSpecs=[...new Set(allQuestions.map(q=>q.specialty))];
-  if(examConfig.specialties.length===0)examConfig.specialties=[...allSpecs];
+  // Solo inicializar si viene de openConfig sin especialidades previas (primera vez)
+  if(examConfig.specialties.length===0&&!preselect)examConfig.specialties=[...allSpecs];
   if(preselect)examConfig.specialties=[preselect];
   const allSel=examConfig.specialties.length===specs.length;
   const btn=document.getElementById('select-all-btn');
@@ -1247,9 +1251,21 @@ function toggleSpec(sp,el){
   if(btn)btn.textContent=examConfig.specialties.length===specs.length?'Ninguna':'Todas';
 }
 function toggleAllSpecs(){
-  const specs=[...new Set(allQuestions.map(q=>q.specialty))];
+  const specs=[...new Set(allQuestions.map(q=>q.specialty))].sort();
   const allSel=examConfig.specialties.length===specs.length;
-  examConfig.specialties=allSel?[]:[...specs];renderSpecCheckList();
+  if(allSel){
+    // Deseleccionar todas — NO llamar renderSpecCheckList porque resetea a todas
+    examConfig.specialties=[];
+    const btn=document.getElementById('select-all-btn');
+    if(btn)btn.textContent='Todas';
+    document.querySelectorAll('#spec-check-list .spec-check').forEach(el=>{
+      el.classList.remove('active');
+      el.querySelector('.sc-checkbox').textContent='';
+    });
+  }else{
+    examConfig.specialties=[...specs];
+    renderSpecCheckList();
+  }
 }
 function selectCount(n){examConfig.count=n;document.querySelectorAll('.count-pill').forEach(el=>el.classList.toggle('active',parseInt(el.dataset.n)===n));}
 function selectMode(m){examConfig.mode=m;document.getElementById('mode-normal').classList.toggle('active',m==='normal');document.getElementById('mode-daily').classList.toggle('active',m==='daily');}
@@ -1513,33 +1529,47 @@ function simNext(){
 async function showSimResults(){
   clearInterval(simTimer);
   let correct=0;
-  // lastExamWrong stores ALL questions with result, for full review
-  lastExamWrong=[];
+  lastExamWrong=[];  // Reset limpio antes de contar
+  const answeredList=[];
+
   for(let i=0;i<simQuestions.length;i++){
     const q=simQuestions[i];
     const ca=(q.correct_answer||'A').toString().trim().toUpperCase();
     const ans=simAnswers[i];
-    const answered=ans!==null;
-    const isCorrect=answered&&ans===ca;
+    if(ans===null)continue; // no respondida: ignorar completamente
+
+    const isCorrect=ans===ca;
     if(isCorrect)correct++;
-    // Track ALL answered questions for review (both correct and wrong)
-    if(answered){
-      lastExamWrong.push({q,userAnswer:ans,correctAnswer:ca,wasCorrect:isCorrect});
-    }
-    if(answered)await updateProgress(q.id,isCorrect,progressMap[q.id]?.starred||false);
+
+    answeredList.push({q,userAnswer:ans,correctAnswer:ca,wasCorrect:isCorrect});
+    await updateProgress(q.id,isCorrect,progressMap[q.id]?.starred||false);
     if(!stats[q.specialty])stats[q.specialty]={correct:0,total:0};
-    if(answered){stats[q.specialty].total++;if(isCorrect)stats[q.specialty].correct++;}
+    stats[q.specialty].total++;
+    if(isCorrect)stats[q.specialty].correct++;
   }
-  profile.xp+=correct*10;profile.lastDate=new Date().toDateString();
-  trackActivity(simQuestions.length);
-  const answered=simAnswers.filter(a=>a!==null).length;
-  const wrong=answered-correct;
-  const pct=answered>0?Math.round(correct/answered*100):0;
-  sessions.unshift({date:new Date().toISOString(),specialties:[...new Set(simQuestions.map(q=>q.specialty))],score:correct,total:simQuestions.length,pct,mode:'simulacro'});
+
+  // lastExamWrong = todas las respondidas (para revisión completa)
+  lastExamWrong=answeredList;
+
+  const totalAnswered=answeredList.length;
+  const wrong=totalAnswered-correct;
+  const pct=totalAnswered>0?Math.round(correct/totalAnswered*100):0;
+
+  profile.xp+=correct*10;
+  profile.lastDate=new Date().toDateString();
+  trackActivity(totalAnswered);
+
+  sessions.unshift({
+    date:new Date().toISOString(),
+    specialties:[...new Set(simQuestions.map(q=>q.specialty))],
+    score:correct,total:totalAnswered,pct,mode:'simulacro'
+  });
   if(sessions.length>100)sessions=sessions.slice(0,100);
   saveLocal();syncToCloud();
+
   examScore=correct;examQuestions=simQuestions;lastExamConfig={...simCfg,mode:'sim'};
-  showResultsScreen(correct,simQuestions.length,'Simulacro UNAL',wrong);
+  // Pasar wrong y totalAnswered explícitamente para que los contadores sean exactos
+  showResultsScreen(correct,totalAnswered,'Simulacro UNAL',wrong);
   showNav();
 }
 
