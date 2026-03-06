@@ -903,7 +903,13 @@ async function loadProgress(){
     const rows=await db.get('progress',{select:'*'});
     progressMap={};
     (rows||[]).forEach(r=>{progressMap[r.question_id]=r;});
-  }catch(e){progressMap={};}
+    // Cache locally for offline fallback
+    localStorage.setItem('mr_progress',JSON.stringify(progressMap));
+  }catch(e){
+    // Offline: restore from local cache
+    try{progressMap=JSON.parse(localStorage.getItem('mr_progress')||'{}');}
+    catch(e2){progressMap={};}
+  }
 }
 
 // ══════════════════════════════════════
@@ -938,6 +944,7 @@ function saveLocal(){
   localStorage.setItem('mr_profile',JSON.stringify(profile));
   localStorage.setItem('mr_sessions',JSON.stringify(sessions));
   localStorage.setItem('mr_activity',JSON.stringify(activityLog));
+  localStorage.setItem('mr_progress',JSON.stringify(progressMap));
 }
 
 function trackActivity(count){
@@ -1590,6 +1597,10 @@ function showResults(){
   const total=examQuestions.length;
   const pct=total>0?Math.round(examScore/total*100):0;
   const wrong=total-examScore;
+  // Award XP and track activity (same logic as simulacro)
+  profile.xp+=examScore*10+(pct===100?50:0);
+  profile.lastDate=new Date().toDateString();
+  trackActivity(total);
   sessions.unshift({date:new Date().toISOString(),specialties:[...new Set(examQuestions.map(q=>q.specialty))],score:examScore,total,pct,mode:lastExamConfig?.mode||'normal'});
   if(sessions.length>100)sessions=sessions.slice(0,100);
   saveLocal();syncToCloud();
