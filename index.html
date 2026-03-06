@@ -228,6 +228,26 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);font-s
 .bib-mastery-lbl{font-size:11px;color:var(--muted);white-space:nowrap;}
 .bib-empty{text-align:center;padding:40px 24px;color:var(--muted);font-size:14px;}
 
+
+/* TEMPORIZADOR POR PREGUNTA */
+.q-timer{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);padding:0 20px 4px;font-weight:600;}
+.q-timer-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:timerPulse 1s ease-in-out infinite;}
+.q-timer.slow .q-timer-dot{background:var(--warn);}
+.q-timer.over .q-timer-dot{background:var(--wrong);}
+.q-timer.over{color:var(--wrong);}
+@keyframes timerPulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* IMPORT CSV */
+.import-zone{border:2px dashed var(--border2);border-radius:16px;padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:4px;}
+.import-zone:hover,.import-zone.drag{border-color:var(--accent);background:rgba(0,212,170,.05);}
+.import-zone-icon{font-size:32px;margin-bottom:8px;}
+.import-zone-lbl{font-size:14px;font-weight:600;color:var(--text2);margin-bottom:4px;}
+.import-zone-sub{font-size:12px;color:var(--muted);}
+.import-progress{background:var(--s2);border-radius:100px;height:6px;overflow:hidden;margin-top:12px;display:none;}
+.import-progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:100px;transition:width .3s;}
+.import-result{font-size:13px;color:var(--accent);font-weight:600;margin-top:8px;min-height:20px;}
+.import-template{font-size:12px;color:var(--accent2);cursor:pointer;text-decoration:underline;margin-top:6px;display:inline-block;}
+
 /* SIMULACRO */
 #screen-sim{background:var(--bg);}
 .sim-bar{display:flex;align-items:center;gap:12px;padding:16px 20px;background:var(--s1);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;}
@@ -487,6 +507,7 @@ select.form-input{cursor:pointer;}
     <div class="quick-card" onclick="openConfig('weak')"><div class="qc-icon">💪</div><div class="qc-title">Mis débiles</div><div class="qc-desc">Donde más fallo</div></div>
     <div class="quick-card" onclick="openDailyExam()"><div class="qc-icon">📅</div><div class="qc-title">Examen diario</div><div class="qc-desc" id="daily-desc">Progresa cada día</div></div>
     <div class="quick-card" onclick="openBiblioteca(null)"><div class="qc-icon">📚</div><div class="qc-title">Biblioteca</div><div class="qc-desc">Revisar preguntas y respuestas</div></div>
+    <div class="quick-card" onclick="openStarredExam()"><div class="qc-icon">⭐</div><div class="qc-title">Marcadas</div><div class="qc-desc" id="starred-desc">Mis preguntas marcadas</div></div>
     <div class="quick-card" onclick="openSimConfig()"><div class="qc-icon">🏥</div><div class="qc-title">Simulacro</div><div class="qc-desc">Examen UNAL real</div></div>
   </div>
 </div>
@@ -531,6 +552,7 @@ select.form-input{cursor:pointer;}
   </div>
   <div class="quiz-body">
     <div class="q-num" id="q-num">Pregunta 1 de 10</div>
+    <div class="q-timer" id="q-timer"><div class="q-timer-dot"></div><span id="q-timer-val">0s</span></div>
     <div class="q-spec-tag" id="q-spec-tag">Especialidad</div>
     <div class="q-text" id="q-text">Cargando…</div>
     <div class="options" id="options"></div>
@@ -671,6 +693,23 @@ select.form-input{cursor:pointer;}
     <div class="form-group"><div class="form-label">Explicación (opcional)</div><textarea class="form-input" id="af-explanation" rows="3" placeholder="¿Por qué es correcta?" style="resize:none;"></textarea></div>
     <div class="form-group"><div class="form-label">Fuente (opcional)</div><input class="form-input" id="af-source" placeholder="Harrison 20ed, Cap 42" type="text"></div>
     <button class="btn-save" onclick="saveQuestion()">💾 Guardar pregunta</button>
+
+    <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border);">
+      <div class="form-label" style="margin-bottom:12px;">📥 Importar preguntas en lote</div>
+      <div class="import-zone" id="import-zone" onclick="document.getElementById('import-file').click()" ondragover="importDragOver(event)" ondrop="importDrop(event)" ondragleave="importDragLeave(event)">
+        <div class="import-zone-icon">📄</div>
+        <div class="import-zone-lbl">Arrastra un CSV o JSON aquí</div>
+        <div class="import-zone-sub">o toca para seleccionar archivo</div>
+        <div class="import-progress" id="import-progress"><div class="import-progress-fill" id="import-progress-fill" style="width:0%"></div></div>
+        <div class="import-result" id="import-result"></div>
+      </div>
+      <input type="file" id="import-file" accept=".csv,.json" style="display:none" onchange="importFile(this)">
+      <span class="import-template" onclick="downloadImportTemplate()">📋 Descargar plantilla CSV</span>
+      <div style="margin-top:12px;font-size:12px;color:var(--muted);line-height:1.7;">
+        <strong style="color:var(--text2);">Columnas CSV:</strong> specialty, question, opt_a, opt_b, opt_c, opt_d, correct_answer, explanation, source<br>
+        <strong style="color:var(--text2);">JSON:</strong> array de objetos con los mismos campos
+      </div>
+    </div>
     <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border);">
       <div class="form-label" style="margin-bottom:12px;">Editar o eliminar pregunta existente</div>
       <div class="form-group">
@@ -840,6 +879,7 @@ function getLevel(xp){return LEVELS.find(l=>xp>=l.min&&xp<l.max)||LEVELS[LEVELS.
 let allQuestions=[],progressMap={};
 let examQuestions=[],examIdx=0,examScore=0;
 let hearts=999;
+let qTimerInterval=null,qTimerSeconds=0;
 let examConfig={count:10,mode:'normal',specialties:[]};
 let lastExamConfig=null;
 let stats={},profile={xp:0,streak:0,lastDate:null,name:''},sessions=[];
@@ -1131,6 +1171,10 @@ function renderHome(){
   }else{banner.innerHTML='';}
 
   // Render specialty branches
+  // Update starred count
+  const starredCount=allQuestions.filter(q=>progressMap[q.id]?.starred).length;
+  const starredDesc=document.getElementById('starred-desc');
+  if(starredDesc)starredDesc.textContent=starredCount>0?`${starredCount} pregunta${starredCount!==1?'s':''} marcadas`:'Sin preguntas marcadas';
   // branches removed - now in Biblioteca
 }
 
@@ -1245,9 +1289,28 @@ function renderQuestion(){
   currentStarred=starred;
   document.getElementById('star-btn').textContent=starred?'⭐':'☆';
   document.getElementById('screen-quiz').scrollTo(0,0);
+  // Start per-question timer
+  clearInterval(qTimerInterval);
+  qTimerSeconds=0;
+  const timerEl=document.getElementById('q-timer');
+  const timerVal=document.getElementById('q-timer-val');
+  if(timerEl)timerEl.className='q-timer';
+  if(timerVal)timerVal.textContent='0s';
+  qTimerInterval=setInterval(()=>{
+    qTimerSeconds++;
+    const s=qTimerSeconds;
+    const txt=s<60?s+'s':Math.floor(s/60)+'m '+( s%60)+'s';
+    if(timerVal)timerVal.textContent=txt;
+    if(timerEl){
+      if(s>120)timerEl.className='q-timer over';
+      else if(s>60)timerEl.className='q-timer slow';
+    }
+  },1000);
 }
 
 async function selectOpt(letter){
+  clearInterval(qTimerInterval);
+  const qTime=qTimerSeconds;
   const q=examQuestions[examIdx];
   const correct=(q.correct_answer||'A').toString().trim().toUpperCase();
   const isCorrect=letter===correct;
@@ -1287,6 +1350,11 @@ function showFeedback(ok,text,srs,masteryHtml){
   document.getElementById('fb-title').textContent=ok?'¡Correcto!':'Incorrecto';
   document.getElementById('fb-title').className=`fb-title ${ok?'c':'w'}`;
   document.getElementById('fb-text').textContent=text;
+  // Show time taken
+  const timerEl=document.getElementById('q-timer');
+  const timerVal=document.getElementById('q-timer-val');
+  if(timerVal){const s=qTimerSeconds;timerVal.textContent=(s<60?s+'s':Math.floor(s/60)+'m '+(s%60)+'s')+' ⏱';}
+  if(timerEl)timerEl.className='q-timer'+(qTimerSeconds>120?' over':qTimerSeconds>60?' slow':'');
   if(masteryHtml)document.getElementById('mastery-info').innerHTML=masteryHtml;
   if(srs){
     const d=srs.interval_days;
@@ -1466,6 +1534,23 @@ function bibToggle(qId){
   }
 }
 
+
+// ══════════════════════════════════════
+//  MODO MARCADAS ⭐
+// ══════════════════════════════════════
+function openStarredExam(){
+  const starred=allQuestions.filter(q=>progressMap[q.id]?.starred);
+  if(starred.length===0){
+    showToast('⭐ No tienes preguntas marcadas aún. Márcalas con ☆ durante el examen.');
+    return;
+  }
+  examConfig={count:starred.length,mode:'starred',specialties:[...new Set(starred.map(q=>q.specialty))]};
+  examQuestions=shuffle([...starred]);
+  examIdx=0;examScore=0;lastExamWrong=[];
+  lastExamConfig=JSON.parse(JSON.stringify(examConfig));
+  renderHearts();renderQuestion();showScreen('quiz');hideNav();
+}
+
 // ══════════════════════════════════════
 //  SIMULACRO CONFIG MODAL — FIX BUG #1
 // ══════════════════════════════════════
@@ -1594,11 +1679,12 @@ async function showSimResults(){
 //  RESULTS
 // ══════════════════════════════════════
 function showResults(){
+  clearInterval(qTimerInterval);
   const total=examQuestions.length;
   const pct=total>0?Math.round(examScore/total*100):0;
   const wrong=total-examScore;
-  // Award XP and track activity (same logic as simulacro)
-  profile.xp+=examScore*10+(pct===100?50:0);
+  // XP ya acumulado en selectOpt (+10/correcta). Solo bonus examen perfecto.
+  if(pct===100){profile.xp+=50;showToast('🏆 ¡Examen perfecto! +50 XP bonus');}
   profile.lastDate=new Date().toDateString();
   trackActivity(total);
   sessions.unshift({date:new Date().toISOString(),specialties:[...new Set(examQuestions.map(q=>q.specialty))],score:examScore,total,pct,mode:lastExamConfig?.mode||'normal'});
@@ -1671,6 +1757,7 @@ function openPostExamReview(){
 
 function retryExam(){
   if(lastExamConfig?.mode==='sim'){startSim();return;}
+  if(lastExamConfig?.mode==='starred'){openStarredExam();return;}
   if(lastExamConfig){examConfig=JSON.parse(JSON.stringify(lastExamConfig));startExam();}
 }
 function confirmLeave(from){
@@ -1935,6 +2022,148 @@ async function saveQuestion(){
 function selectCorrect(l){
   selectedCorrect=l;
   document.querySelectorAll('#screen-admin .correct-opt').forEach(el=>el.classList.toggle('active',el.dataset.l===l));
+}
+
+
+// ══════════════════════════════════════
+//  IMPORTAR PREGUNTAS EN LOTE
+// ══════════════════════════════════════
+function importDragOver(e){e.preventDefault();document.getElementById('import-zone').classList.add('drag');}
+function importDragLeave(e){document.getElementById('import-zone').classList.remove('drag');}
+function importDrop(e){
+  e.preventDefault();
+  document.getElementById('import-zone').classList.remove('drag');
+  const file=e.dataTransfer.files[0];
+  if(file)processImportFile(file);
+}
+function importFile(input){
+  if(input.files[0])processImportFile(input.files[0]);
+  input.value='';
+}
+
+function processImportFile(file){
+  const resultEl=document.getElementById('import-result');
+  const progressBar=document.getElementById('import-progress');
+  const progressFill=document.getElementById('import-progress-fill');
+  resultEl.textContent='Leyendo archivo…';
+  progressBar.style.display='block';
+  progressFill.style.width='10%';
+
+  const reader=new FileReader();
+  reader.onload=async(e)=>{
+    try{
+      let rows=[];
+      const text=e.target.result.trim();
+
+      if(file.name.endsWith('.json')){
+        const parsed=JSON.parse(text);
+        rows=Array.isArray(parsed)?parsed:[parsed];
+      } else {
+        // CSV parser — handles quoted fields with commas
+        const lines=text.split(/\r?\n/).filter(l=>l.trim());
+        const headers=parseCSVLine(lines[0]).map(h=>h.trim().toLowerCase());
+        for(let i=1;i<lines.length;i++){
+          const vals=parseCSVLine(lines[i]);
+          const obj={};
+          headers.forEach((h,j)=>obj[h]=(vals[j]||'').trim());
+          rows.push(obj);
+        }
+      }
+
+      // Validate required fields
+      const required=['specialty','question','opt_a','opt_b','correct_answer'];
+      const valid=rows.filter(r=>required.every(k=>r[k]&&r[k].trim()));
+      const skipped=rows.length-valid.length;
+
+      if(valid.length===0){
+        resultEl.textContent='⚠️ Sin filas válidas. Revisa el formato.';
+        progressBar.style.display='none';
+        return;
+      }
+
+      progressFill.style.width='30%';
+      resultEl.textContent=`Subiendo ${valid.length} preguntas…`;
+
+      // Upload in batches of 20
+      let saved=0;
+      const BATCH=20;
+      for(let i=0;i<valid.length;i+=BATCH){
+        const batch=valid.slice(i,i+BATCH).map(r=>({
+          specialty:normalizeSpec(r.specialty||'General'),
+          question:r.question,
+          opt_a:r.opt_a,
+          opt_b:r.opt_b,
+          opt_c:r.opt_c||'',
+          opt_d:r.opt_d||'',
+          correct_answer:(r.correct_answer||'A').toUpperCase(),
+          explanation:r.explanation||'',
+          source:r.source||''
+        }));
+        try{
+          const res=await db.post('questions',batch);
+          const inserted=Array.isArray(res)?res:[];
+          inserted.forEach(q=>{if(q&&q.id)allQuestions.push({...q,specialty:normalizeSpec(q.specialty)});});
+          saved+=batch.length;
+        }catch(err){
+          // Try one by one if batch fails
+          for(const q of batch){
+            try{
+              const res=await db.post('questions',[q]);
+              if(res&&res[0])allQuestions.push({...res[0],specialty:normalizeSpec(res[0].specialty)});
+              saved++;
+            }catch(e2){}
+          }
+        }
+        const pct=30+Math.round((i+BATCH)/valid.length*65);
+        progressFill.style.width=Math.min(pct,95)+'%';
+        resultEl.textContent=`Subiendo… ${Math.min(i+BATCH,valid.length)}/${valid.length}`;
+      }
+
+      progressFill.style.width='100%';
+      let msg=`✅ ${saved} pregunta${saved!==1?'s':''} importada${saved!==1?'s':''}`;
+      if(skipped>0)msg+=` · ${skipped} omitidas (sin datos)`;
+      resultEl.textContent=msg;
+      showToast(msg);
+      saveLocal();
+      renderHome();renderAdminSpecSelect();renderSpecCheckList();
+      // Refresh biblioteca if it's open
+      if(document.getElementById('screen-biblioteca').classList.contains('active')){
+        renderBibTabs();bibBuildPool();renderBibPage();
+      }
+      setTimeout(()=>{progressBar.style.display='none';progressFill.style.width='0%';},3000);
+    }catch(err){
+      document.getElementById('import-result').textContent='❌ Error: '+err.message;
+      document.getElementById('import-progress').style.display='none';
+    }
+  };
+  reader.readAsText(file);
+}
+
+function parseCSVLine(line){
+  const result=[];
+  let cur='';
+  let inQuote=false;
+  for(let i=0;i<line.length;i++){
+    const ch=line[i];
+    if(ch==='"'){
+      if(inQuote&&line[i+1]==='"'){cur+='"';i++;}
+      else{inQuote=!inQuote;}
+    } else if(ch===','&&!inQuote){
+      result.push(cur);cur='';
+    } else {cur+=ch;}
+  }
+  result.push(cur);
+  return result;
+}
+
+function downloadImportTemplate(){
+  const header='specialty,question,opt_a,opt_b,opt_c,opt_d,correct_answer,explanation,source';
+  const example='Cardiología,"Paciente 60 años con disnea de esfuerzo, ortopnea y crepitantes bibasales. ¿Diagnóstico más probable?",Neumonía,Insuficiencia cardíaca,EPOC,TEP,B,"La IC se presenta con disnea, ortopnea y crepitantes por congestión pulmonar. El edema y la cardiomegalia confirman.",Harrison 21ed';
+  const blob=new Blob([header+'\n'+example],{type:'text/csv'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='plantilla_preguntas.csv';
+  a.click();
 }
 
 // ══════════════════════════════════════
