@@ -205,29 +205,49 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);font-s
 .bib-page-btn:hover:not([disabled]){background:var(--border2);}
 .bib-page-btn[disabled]{opacity:.3;cursor:default;pointer-events:none;}
 .bib-page-info{font-size:12px;color:var(--muted);min-width:56px;text-align:center;}
-.bib-list{flex:1;overflow-y:auto;padding:0 16px;display:flex;flex-direction:column;gap:10px;padding-bottom:calc(var(--nav-h) + 24px + env(safe-area-inset-bottom));}
-.bib-item{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .2s;}
-.bib-item.open{border-color:var(--accent2);}
-.bib-item-header{padding:16px 18px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none;}
-.bib-num{flex-shrink:0;width:24px;height:24px;border-radius:7px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--muted);margin-top:3px;}
-.bib-q{font-size:14px;line-height:1.65;color:var(--text);flex:1;white-space:normal;word-break:break-word;}
+.bib-list{flex:1;overflow-y:auto;padding:12px 12px 0;display:flex;flex-direction:column;gap:10px;padding-bottom:calc(var(--nav-h) + 36px + env(safe-area-inset-bottom));}
+.bib-item{background:var(--card);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;transition:border-color .2s;}
+.bib-item.open{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(0,212,170,.08);}
+.bib-item-header{padding:16px 16px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none;min-height:54px;}
+.bib-num{flex-shrink:0;min-width:26px;height:26px;border-radius:8px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--muted);margin-top:2px;padding:0 3px;}
+.bib-q{font-size:14px;line-height:1.72;color:var(--text);flex:1;white-space:normal;word-break:break-word;overflow-wrap:anywhere;}
 .bib-chevron{flex-shrink:0;font-size:18px;color:var(--muted);transition:transform .25s;margin-top:1px;}
 .bib-item.open .bib-chevron{transform:rotate(90deg);color:var(--accent2);}
-.bib-body{display:none;padding:0 18px 18px;border-top:1px solid var(--border);animation:panelIn .2s ease;}
+.bib-body{display:none;padding:0 0 4px;border-top:1.5px solid var(--border);animation:panelIn .2s ease;}
 .bib-item.open .bib-body{display:block;}
-.bib-opts{display:flex;flex-direction:column;gap:7px;margin:14px 0;}
-.bib-opt{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--muted);line-height:1.6;padding:10px 13px;border-radius:10px;background:var(--s2);word-break:break-word;}
-.bib-opt.is-correct{background:rgba(0,200,150,.1);color:var(--correct);font-weight:600;}
-.bib-opt-letter{flex-shrink:0;width:22px;height:22px;border-radius:6px;background:var(--s1);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-top:1px;}
+.bib-opts{display:flex;flex-direction:column;gap:8px;padding:14px 14px 4px;}
+.bib-opt{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--text2);line-height:1.68;padding:12px 13px;border-radius:12px;background:var(--s2);word-break:break-word;overflow-wrap:anywhere;}
+.bib-opt.is-correct{background:rgba(0,200,150,.13);color:var(--correct);font-weight:600;border:1px solid rgba(0,200,150,.25);}
+.bib-opt-letter{flex-shrink:0;width:24px;height:24px;border-radius:7px;background:var(--s1);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-top:2px;}
 .bib-opt.is-correct .bib-opt-letter{background:var(--correct);color:#000;}
-.bib-explanation{font-size:14px;color:var(--text2);line-height:1.65;border-top:1px solid var(--border);padding-top:12px;margin-top:4px;}
-.bib-source{font-size:11px;color:var(--muted);margin-top:6px;font-style:italic;}
-.bib-mastery{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid var(--border);}
+.bib-explanation{font-size:14px;color:var(--text2);line-height:1.72;border-top:1.5px solid var(--border);padding:14px 14px 4px;margin:4px 0 0;}
+.bib-source{font-size:12px;color:var(--muted);padding:8px 14px 14px;font-style:italic;border-top:1px solid var(--border);margin-top:4px;}
+.bib-mastery{display:flex;align-items:center;gap:10px;padding:10px 14px 14px;border-top:1px solid var(--border);margin-top:4px;}
 .bib-mastery-bar{flex:1;height:4px;background:var(--s2);border-radius:100px;overflow:hidden;}
 .bib-mastery-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--warn),var(--correct));}
 .bib-mastery-lbl{font-size:11px;color:var(--muted);white-space:nowrap;}
-.bib-empty{text-align:center;padding:40px 24px;color:var(--muted);font-size:14px;}
+.bib-empty{text-align:center;padding:52px 24px;color:var(--muted);font-size:14px;line-height:1.6;}
 
+
+
+/* IMÁGENES EN PREGUNTAS */
+.q-image{width:100%;max-width:480px;border-radius:12px;margin:10px auto 14px;display:block;border:1px solid var(--border2);background:var(--s2);object-fit:contain;max-height:280px;cursor:pointer;}
+.q-image-wrap{text-align:center;position:relative;}
+.q-image-wrap .img-expand{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:8px;padding:4px 8px;font-size:11px;cursor:pointer;backdrop-filter:blur(4px);}
+.bib-image{width:100%;max-height:220px;object-fit:contain;border-radius:10px;margin-bottom:12px;border:1px solid var(--border2);cursor:pointer;}
+
+/* MODAL IMAGEN AMPLIADA */
+.img-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;align-items:center;justify-content:center;padding:20px;}
+.img-modal.open{display:flex;}
+.img-modal img{max-width:100%;max-height:90vh;border-radius:12px;object-fit:contain;}
+.img-modal-close{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:22px;width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+/* UPLOAD IMAGEN EN ADMIN */
+.img-upload-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.img-preview{width:80px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--border2);display:none;}
+.img-upload-btn{flex:1;padding:10px;background:var(--s2);border:1px dashed var(--border2);border-radius:10px;color:var(--text2);font-size:13px;cursor:pointer;text-align:center;min-width:120px;}
+.img-upload-btn:hover{border-color:var(--accent);}
+.img-clear-btn{background:none;border:none;color:var(--wrong);font-size:18px;cursor:pointer;padding:4px;display:none;}
 
 /* TEMPORIZADOR POR PREGUNTA */
 .q-timer{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);padding:0 20px 4px;font-weight:600;}
@@ -555,6 +575,10 @@ select.form-input{cursor:pointer;}
     <div class="q-timer" id="q-timer"><div class="q-timer-dot"></div><span id="q-timer-val">0s</span></div>
     <div class="q-spec-tag" id="q-spec-tag">Especialidad</div>
     <div class="q-text" id="q-text">Cargando…</div>
+    <div class="q-image-wrap" id="q-image-wrap" style="display:none">
+      <img class="q-image" id="q-image" src="" alt="Imagen de la pregunta" onclick="openImgModal(this.src)">
+      <button class="img-expand" onclick="openImgModal(document.getElementById('q-image').src)">⛶ Ampliar</button>
+    </div>
     <div class="options" id="options"></div>
     <button class="star-btn" id="star-btn" onclick="toggleStar()">☆</button>
     <div class="feedback-panel" id="feedback-panel">
@@ -603,6 +627,10 @@ select.form-input{cursor:pointer;}
     <div class="q-num" id="sim-q-num">Pregunta 1 de 60</div>
     <div class="q-spec-tag" id="sim-spec-tag">Especialidad</div>
     <div class="q-text" id="sim-q-text">Cargando…</div>
+    <div class="q-image-wrap" id="sim-image-wrap" style="display:none">
+      <img class="q-image" id="sim-image" src="" alt="Imagen de la pregunta" onclick="openImgModal(this.src)">
+      <button class="img-expand" onclick="openImgModal(document.getElementById('sim-image').src)">⛶ Ampliar</button>
+    </div>
     <!-- FIX BUG #1: id correcto, sin onclick en hijos -->
     <div id="sim-options" class="options"></div>
   </div>
@@ -692,6 +720,16 @@ select.form-input{cursor:pointer;}
     </div>
     <div class="form-group"><div class="form-label">Explicación (opcional)</div><textarea class="form-input" id="af-explanation" rows="3" placeholder="¿Por qué es correcta?" style="resize:none;"></textarea></div>
     <div class="form-group"><div class="form-label">Fuente (opcional)</div><input class="form-input" id="af-source" placeholder="Harrison 20ed, Cap 42" type="text"></div>
+    <div class="form-group">
+      <div class="form-label">Imagen (opcional)</div>
+      <div class="img-upload-row">
+        <div class="img-upload-btn" onclick="document.getElementById('af-image-file').click()">📷 Seleccionar imagen</div>
+        <img class="img-preview" id="af-image-preview" src="" alt="preview">
+        <button class="img-clear-btn" id="af-image-clear" onclick="clearAdminImage()">✕</button>
+      </div>
+      <input type="file" id="af-image-file" accept="image/*" style="display:none" onchange="previewAdminImage(this)">
+      <input type="hidden" id="af-image-url" value="">
+    </div>
     <button class="btn-save" onclick="saveQuestion()">💾 Guardar pregunta</button>
 
     <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border);">
@@ -720,6 +758,12 @@ select.form-input{cursor:pointer;}
       <div id="edit-q-list" style="display:flex;flex-direction:column;gap:8px;margin-top:8px;"></div>
     </div>
   </div>
+</div>
+
+<!-- MODAL IMAGEN AMPLIADA -->
+<div class="img-modal" id="img-modal" onclick="closeImgModal()">
+  <button class="img-modal-close" onclick="closeImgModal()">✕</button>
+  <img id="img-modal-src" src="" alt="Imagen pregunta">
 </div>
 
 <!-- NAV -->
@@ -1277,6 +1321,16 @@ function renderQuestion(){
   document.getElementById('q-num').textContent=`Pregunta ${examIdx+1} de ${total}`;
   document.getElementById('q-spec-tag').textContent=`${specIcon(q.specialty)} ${q.specialty}`;
   document.getElementById('q-text').textContent=q.question||'';
+  // Image support
+  const qImgWrap=document.getElementById('q-image-wrap');
+  const qImg=document.getElementById('q-image');
+  if(q.image_url&&q.image_url.trim()){
+    qImg.src=q.image_url.trim();
+    qImgWrap.style.display='block';
+  }else{
+    qImgWrap.style.display='none';
+    qImg.src='';
+  }
   document.getElementById('quiz-prog').style.width=`${(examIdx/total)*100}%`;
   const opts=[{l:'A',t:q.opt_a||''},{l:'B',t:q.opt_b||''},{l:'C',t:q.opt_c||''},{l:'D',t:q.opt_d||''}].filter(o=>o.t.trim()!=='');
   document.getElementById('options').innerHTML=opts.map(o=>`<button class="opt" id="opt-${o.l}" type="button" onclick="selectOpt('${o.l}')"><span class="opt-letter">${o.l}</span><span>${escapeHtml(o.t)}</span></button>`).join('');
@@ -1513,9 +1567,10 @@ function renderBibPage(){
         <div class="bib-chevron">›</div>
       </div>
       <div class="bib-body">
-        <div style="font-size:11px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">${specIcon(q.specialty)} ${escapeHtml(q.specialty)}</div>
+        <div style="font-size:11px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:12px 14px 0;">${specIcon(q.specialty)} ${escapeHtml(q.specialty)}</div>
+        ${q.image_url?`<div style="padding:10px 14px 0;text-align:center;"><img class="bib-image" src="${q.image_url}" alt="Imagen" onclick="openImgModal('${q.image_url}')"></div>`:''}
         <div class="bib-opts">${optsHtml}</div>
-        ${q.explanation?`<div class="bib-explanation">💡 ${escapeHtml(q.explanation)}</div>`:''}
+        ${q.explanation?`<div class="bib-explanation"><div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px;">💡 Explicación</div>${escapeHtml(q.explanation)}</div>`:''}
         ${q.source?`<div class="bib-source">📖 ${escapeHtml(q.source)}</div>`:''}
         ${masteryHtml}
       </div>
@@ -1598,6 +1653,16 @@ function renderSimQuestion(){
   document.getElementById('sim-q-num').textContent=`Pregunta ${simIdx+1} de ${total}`;
   document.getElementById('sim-spec-tag').textContent=`${specIcon(q.specialty)} ${q.specialty}`;
   document.getElementById('sim-q-text').textContent=q.question||'';
+  // Image support
+  const sImgWrap=document.getElementById('sim-image-wrap');
+  const sImg=document.getElementById('sim-image');
+  if(q.image_url&&q.image_url.trim()){
+    sImg.src=q.image_url.trim();
+    sImgWrap.style.display='block';
+  }else{
+    sImgWrap.style.display='none';
+    sImg.src='';
+  }
   document.getElementById('sim-prog').style.width=`${((simIdx+1)/total)*100}%`;
   const opts=[{l:'A',t:q.opt_a||''},{l:'B',t:q.opt_b||''},{l:'C',t:q.opt_c||''},{l:'D',t:q.opt_d||''}].filter(o=>o.t.trim()!=='');
   const saved=simAnswers[simIdx];
@@ -2010,10 +2075,12 @@ async function saveQuestion(){
   const source=document.getElementById('af-source').value.trim();
   if(!specialty||!question||!opt_a||!opt_b){showToast('⚠️ Faltan datos obligatorios');return;}
   try{
-    const saved=await db.post('questions',{specialty,question,opt_a,opt_b,opt_c,opt_d,correct_answer:selectedCorrect,explanation,source});
+    const image_url=document.getElementById('af-image-url').value.trim();
+    const saved=await db.post('questions',{specialty,question,opt_a,opt_b,opt_c,opt_d,correct_answer:selectedCorrect,explanation,source,image_url:image_url||null});
     allQuestions.push(saved[0]||{specialty,question,opt_a,opt_b,opt_c,opt_d,correct_answer:selectedCorrect,explanation,source});
     showToast('✅ Pregunta guardada');
     ['af-question','af-optA','af-optB','af-optC','af-optD','af-explanation','af-source','af-new-specialty'].forEach(id=>{document.getElementById(id).value='';});
+    clearAdminImage();
     document.getElementById('af-specialty').value='';
     selectCorrect('A');renderHome();renderAdminSpecSelect();renderSpecCheckList();
   }catch(e){showToast('❌ Error: '+e.message);}
@@ -2024,6 +2091,86 @@ function selectCorrect(l){
   document.querySelectorAll('#screen-admin .correct-opt').forEach(el=>el.classList.toggle('active',el.dataset.l===l));
 }
 
+
+
+// ══════════════════════════════════════
+//  IMÁGENES
+// ══════════════════════════════════════
+function openImgModal(src){
+  if(!src)return;
+  document.getElementById('img-modal-src').src=src;
+  document.getElementById('img-modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeImgModal(){
+  document.getElementById('img-modal').classList.remove('open');
+  document.getElementById('img-modal-src').src='';
+  document.body.style.overflow='';
+}
+// Close modal on Escape key
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeImgModal();});
+
+function previewAdminImage(input){
+  const file=input.files[0];
+  if(!file)return;
+  const preview=document.getElementById('af-image-preview');
+  const clearBtn=document.getElementById('af-image-clear');
+  // Show local preview immediately
+  const reader=new FileReader();
+  reader.onload=e=>{
+    preview.src=e.target.result;
+    preview.style.display='block';
+    clearBtn.style.display='block';
+  };
+  reader.readAsDataURL(file);
+  // Upload to Supabase Storage
+  uploadImageToStorage(file);
+}
+
+async function uploadImageToStorage(file){
+  const urlInput=document.getElementById('af-image-url');
+  urlInput.value='uploading...';
+  showToast('📤 Subiendo imagen...');
+  try{
+    const ext=file.name.split('.').pop().toLowerCase();
+    const fname=`q_${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+    const res=await fetch(`${SUPA_URL}/storage/v1/object/question-images/${fname}`,{
+      method:'POST',
+      headers:{
+        'apikey':SUPA_KEY,
+        'Authorization':'Bearer '+SUPA_KEY,
+        'Content-Type':file.type,
+        'x-upsert':'true'
+      },
+      body:file
+    });
+    if(!res.ok){
+      const err=await res.text();
+      // If bucket doesn't exist yet, show instructions
+      if(err.includes('Bucket not found')||err.includes('bucket')){
+        showToast('⚠️ Crea el bucket "question-images" en Supabase Storage primero');
+        urlInput.value='';
+        return;
+      }
+      throw new Error(err);
+    }
+    // Build public URL
+    const publicUrl=`${SUPA_URL}/storage/v1/object/public/question-images/${fname}`;
+    urlInput.value=publicUrl;
+    showToast('✅ Imagen subida');
+  }catch(e){
+    showToast('❌ Error subiendo imagen: '+e.message);
+    urlInput.value='';
+  }
+}
+
+function clearAdminImage(){
+  document.getElementById('af-image-file').value='';
+  document.getElementById('af-image-preview').src='';
+  document.getElementById('af-image-preview').style.display='none';
+  document.getElementById('af-image-clear').style.display='none';
+  document.getElementById('af-image-url').value='';
+}
 
 // ══════════════════════════════════════
 //  IMPORTAR PREGUNTAS EN LOTE
@@ -2097,7 +2244,8 @@ function processImportFile(file){
           opt_d:r.opt_d||'',
           correct_answer:(r.correct_answer||'A').toUpperCase(),
           explanation:r.explanation||'',
-          source:r.source||''
+          source:r.source||'',
+          image_url:r.image_url||null
         }));
         try{
           const res=await db.post('questions',batch);
