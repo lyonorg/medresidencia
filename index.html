@@ -194,23 +194,39 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);font-s
 .btn-action:disabled{opacity:.3;cursor:default;transform:none;}
 
 /* FLASHCARD */
-#screen-flash{background:var(--bg);}
-.flash-bar{display:flex;align-items:center;gap:12px;padding:16px 20px;background:var(--s1);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;}
-.flash-body{padding:20px;flex:1;display:flex;flex-direction:column;gap:14px;}
-.flash-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px 22px;min-height:200px;display:flex;flex-direction:column;justify-content:center;cursor:pointer;transition:all .2s;box-shadow:var(--shadow);position:relative;overflow:hidden;}
-.flash-card:active{transform:scale(.99);}
-.flash-question{font-family:'Playfair Display',serif;font-size:clamp(18px,4.5vw,22px);line-height:1.65;color:var(--text);}
-.flash-reveal{margin-top:18px;display:none;border-top:1px solid var(--border);padding-top:16px;}
-.flash-reveal.show{display:block;animation:panelIn .2s ease;}
-.flash-answer{font-size:17px;font-weight:700;color:var(--accent);margin-bottom:8px;}
-.flash-explanation{font-size:14px;color:var(--text2);line-height:1.6;}
-.flash-tap-hint{font-size:13px;color:var(--muted);text-align:center;margin-top:8px;}
-/* FIX BUG #3: botones flashcard con cursor pointer explícito y z-index */
-.flash-actions{display:flex;gap:10px;position:relative;z-index:5;}
-.flash-btn{flex:1;border:none;border-radius:14px;padding:16px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;-webkit-appearance:none;appearance:none;touch-action:manipulation;}
-.flash-btn.wrong{background:rgba(255,71,87,.12);border:1.5px solid rgba(255,71,87,.3);color:var(--wrong);}
-.flash-btn.correct{background:rgba(0,200,150,.12);border:1.5px solid rgba(0,200,150,.3);color:var(--correct);}
-.flash-btn:active{transform:scale(.97);}
+/* BIBLIOTECA */
+#screen-biblioteca{background:var(--bg);overflow:hidden;padding-bottom:0!important;}
+#screen-biblioteca .top-bar{flex-shrink:0;}
+.bib-tabs{flex-shrink:0;display:flex;gap:6px;padding:0 20px 12px;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none;}
+.bib-tabs::-webkit-scrollbar{display:none;}
+.bib-tab{flex-shrink:0;background:var(--s2);border:1.5px solid var(--border);border-radius:100px;padding:8px 14px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.bib-tab.active{background:rgba(0,212,170,.12);border-color:var(--accent);color:var(--accent);}
+.bib-list{flex:1;overflow-y:auto;padding:0 20px;display:flex;flex-direction:column;gap:10px;padding-bottom:calc(var(--nav-h) + 32px + env(safe-area-inset-bottom));}
+.bib-item{background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden;transition:border-color .2s;}
+.bib-item.open{border-color:var(--accent2);}
+.bib-item-header{padding:16px 18px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;touch-action:manipulation;}
+.bib-num{flex-shrink:0;width:28px;height:28px;border-radius:8px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--muted);margin-top:2px;}
+.bib-q{font-family:'Playfair Display',serif;font-size:15px;line-height:1.55;color:var(--text);flex:1;}
+.bib-chevron{flex-shrink:0;font-size:16px;color:var(--muted);transition:transform .25s;margin-top:2px;}
+.bib-item.open .bib-chevron{transform:rotate(90deg);color:var(--accent2);}
+.bib-body{display:none;padding:0 18px 18px;border-top:1px solid var(--border);animation:panelIn .2s ease;}
+.bib-item.open .bib-body{display:block;}
+.bib-opts{display:flex;flex-direction:column;gap:6px;margin:14px 0;}
+.bib-opt{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--muted);line-height:1.5;padding:8px 12px;border-radius:10px;background:var(--s2);}
+.bib-opt.is-correct{background:rgba(0,200,150,.1);color:var(--correct);font-weight:600;}
+.bib-opt-letter{flex-shrink:0;width:22px;height:22px;border-radius:6px;background:var(--s1);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+.bib-opt.is-correct .bib-opt-letter{background:var(--correct);color:#000;}
+.bib-explanation{font-size:13px;color:var(--text2);line-height:1.6;border-top:1px solid var(--border);padding-top:12px;margin-top:4px;}
+.bib-source{font-size:11px;color:var(--muted);margin-top:8px;font-style:italic;}
+.bib-mastery{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
+.bib-mastery-bar{flex:1;height:5px;background:var(--s2);border-radius:100px;overflow:hidden;}
+.bib-mastery-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--warn),var(--correct));}
+.bib-mastery-lbl{font-size:11px;color:var(--muted);white-space:nowrap;}
+.bib-empty{text-align:center;padding:40px 24px;color:var(--muted);font-size:14px;}
+.bib-search{margin:0 20px 12px;background:var(--s2);border:1.5px solid var(--border);border-radius:14px;padding:12px 16px;font-size:15px;color:var(--text);font-family:'Sora',sans-serif;outline:none;width:calc(100% - 40px);transition:border-color .15s;-webkit-appearance:none;}
+.bib-search:focus{border-color:var(--accent);}
+.bib-search::placeholder{color:var(--muted);}
+.bib-count{flex-shrink:0;font-size:12px;color:var(--muted);padding:0 20px 8px;}
 
 /* SIMULACRO */
 #screen-sim{background:var(--bg);}
@@ -470,6 +486,7 @@ select.form-input{cursor:pointer;}
     <div class="quick-card" onclick="openConfig('quick5')"><div class="qc-icon">⚡</div><div class="qc-title">Rápido</div><div class="qc-desc">5 preguntas random</div><div class="qc-badge">5</div></div>
     <div class="quick-card" onclick="openConfig('weak')"><div class="qc-icon">💪</div><div class="qc-title">Mis débiles</div><div class="qc-desc">Donde más fallo</div></div>
     <div class="quick-card" onclick="openDailyExam()"><div class="qc-icon">📅</div><div class="qc-title">Examen diario</div><div class="qc-desc" id="daily-desc">Progresa cada día</div></div>
+    <div class="quick-card" onclick="openBiblioteca(null)"><div class="qc-icon">📚</div><div class="qc-title">Biblioteca</div><div class="qc-desc">Revisar preguntas y respuestas</div></div>
     <div class="quick-card" onclick="openSimConfig()"><div class="qc-icon">🏥</div><div class="qc-title">Simulacro</div><div class="qc-desc">Examen UNAL real</div></div>
   </div>
   <div class="section-hdr">Por área de conocimiento</div>
@@ -530,46 +547,16 @@ select.form-input{cursor:pointer;}
   <div class="quiz-bottom"><button class="btn-action secondary" id="btn-action" disabled onclick="handleAction()">Selecciona una opción</button></div>
 </div>
 
-<!-- FLASHCARD: SELECTOR -->
-<div class="screen" id="screen-flash-pick">
+<!-- BIBLIOTECA DE PREGUNTAS -->
+<div class="screen" id="screen-biblioteca">
   <div class="top-bar">
-    <div class="top-bar-title">🃏 Flashcards</div>
-    <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn-flash">🌙</button>
+    <div class="top-bar-title">📚 Biblioteca</div>
+    <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn-bib">🌙</button>
   </div>
-  <div style="padding:0 20px 10px;">
-    <p style="font-size:14px;color:var(--muted);margin-bottom:16px;">Elige una especialidad para repasar:</p>
-    <!-- FIX BUG #2: touch-action y cursor pointer explícito -->
-    <button onclick="startFlashcard(null)" style="background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;border:none;border-radius:16px;padding:16px 20px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;width:100%;text-align:left;margin-bottom:12px;display:flex;align-items:center;gap:12px;touch-action:manipulation;-webkit-appearance:none;">
-      <span style="font-size:24px;">🔀</span>
-      <div><div>Todas las especialidades</div><div style="font-size:12px;font-weight:400;opacity:.8;" id="flash-all-count">… preguntas</div></div>
-    </button>
-    <div id="flash-spec-pick-list" style="display:flex;flex-direction:column;gap:8px;"></div>
-  </div>
-</div>
-
-<!-- FLASHCARD: CARTA -->
-<div class="screen" id="screen-flash">
-  <div class="flash-bar">
-    <!-- FIX BUG #3: botón de regreso -->
-    <button class="quiz-close" onclick="backToFlashPick()" style="font-size:18px;">←</button>
-    <div class="quiz-progress-wrap"><div class="quiz-progress-fill" id="flash-prog" style="width:0%"></div></div>
-    <div style="font-size:13px;color:var(--muted);white-space:nowrap;" id="flash-counter">1/10</div>
-  </div>
-  <div class="flash-body">
-    <div class="flash-card" id="flash-card" onclick="revealFlash()">
-      <div class="q-spec-tag" id="flash-spec-tag">Especialidad</div>
-      <div class="flash-question" id="flash-question">Cargando…</div>
-      <div class="flash-tap-hint" id="flash-hint">👆 Toca para ver la respuesta</div>
-      <div class="flash-reveal" id="flash-reveal">
-        <div class="flash-answer" id="flash-answer"></div>
-        <div class="flash-explanation" id="flash-explanation"></div>
-      </div>
-    </div>
-    <div class="flash-actions" id="flash-actions" style="display:none;">
-      <button class="flash-btn wrong" type="button" onclick="flashAnswer(false)">✗ No sabía</button>
-      <button class="flash-btn correct" type="button" onclick="flashAnswer(true)">✓ Lo sabía</button>
-    </div>
-  </div>
+  <input class="bib-search" id="bib-search" type="search" placeholder="🔍 Buscar pregunta…" oninput="bibSearch(this.value)"/>
+  <div class="bib-tabs" id="bib-tabs"></div>
+  <div class="bib-count" id="bib-count"></div>
+  <div class="bib-list" id="bib-list"></div>
 </div>
 
 <!-- SIMULACRO -->
@@ -846,8 +833,7 @@ let examConfig={count:10,mode:'normal',specialties:[]};
 let lastExamConfig=null;
 let stats={},profile={xp:0,streak:0,lastDate:null,name:''},sessions=[];
 let selectedCorrect='A',currentPeriod='all';
-// Flashcard
-let flashQuestions=[],flashIdx=0,flashRevealed=false;
+// Biblioteca state - inicializado más abajo en la función openBiblioteca
 // Simulacro
 let simQuestions=[],simIdx=0,simAnswers=[],simTimer=null,simSeconds=0;
 let simCfg={count:60,minutes:90};
@@ -1008,7 +994,7 @@ function toggleTheme(){
 function applyTheme(){
   const isDark=document.documentElement.getAttribute('data-theme')==='dark';
   const icon=isDark?'🌙':'☀️';
-  ['theme-btn','theme-btn-cfg','theme-btn-stats','theme-btn-admin','theme-btn-flash'].forEach(id=>{
+  ['theme-btn','theme-btn-cfg','theme-btn-stats','theme-btn-admin','theme-btn-bib'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.textContent=icon;
   });
 }
@@ -1165,7 +1151,7 @@ function renderSpecBranches(){
       // Mastery count
       const masteredInSpec=allQuestions.filter(q=>q.specialty===sp&&isDominated(progressMap[q.id])).length;
       const masteryStr=masteredInSpec>0?` · ${masteredInSpec} dominadas`:'';
-      return `<div class="spec-row" onclick="openConfig('specialty','${escapeHtml(sp)}')">
+      return `<div class="spec-row" onclick="openBiblioteca('${escapeHtml(sp)}')">
         <div class="sr-icon" style="background:${group.color}22;">${specIcon(sp)}</div>
         <div class="sr-info"><div class="sr-name">${escapeHtml(sp)} ${badge}</div><div class="sr-sub">${count} preg.${masteryStr}</div></div>
         <div class="sr-progress"><div class="sr-pct" style="color:${pc}">${st.total>0?p2+'%':'—'}</div><div class="sr-bar"><div class="sr-fill" style="width:${p2}%;background:${pc}"></div></div></div>
@@ -1371,83 +1357,126 @@ async function toggleStar(){
 }
 
 // ══════════════════════════════════════
-//  FLASHCARD
+//  BIBLIOTECA DE PREGUNTAS
 // ══════════════════════════════════════
-function openFlashPick(){
-  const specs=[...new Set(allQuestions.map(q=>q.specialty))].sort();
-  const totalEl=document.getElementById('flash-all-count');
-  if(totalEl)totalEl.textContent=`${allQuestions.length} preguntas`;
+let bibCurrentSpec='__all__';
+let bibSearchQuery='';
+
+function openBiblioteca(specialty){
+  bibCurrentSpec=specialty||'__all__';
+  bibSearchQuery='';
+  const searchEl=document.getElementById('bib-search');
+  if(searchEl)searchEl.value='';
+  renderBibTabs();
+  renderBibList();
   applyTheme();
-  const list=document.getElementById('flash-spec-pick-list');
-  list.innerHTML=specs.map((sp,i)=>{
-    const count=allQuestions.filter(q=>q.specialty===sp).length;
-    const st=stats[sp]||{correct:0,total:0};
-    const pct=st.total>0?Math.round(st.correct/st.total*100):null;
-    const color=specColor(sp,i);
-    const pctStr=pct!==null?`${pct}% acierto · `:'';
-    // FIX BUG #2: use button element with touch-action
-    return `<button type="button" onclick="startFlashcard('${escapeHtml(sp)}')"
-      style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 16px;
-             display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .18s;width:100%;
-             font-family:'Sora',sans-serif;text-align:left;touch-action:manipulation;-webkit-appearance:none;">
-      <div style="width:44px;height:44px;border-radius:13px;background:${color}22;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">${specIcon(sp)}</div>
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:15px;font-weight:600;color:var(--text);">${escapeHtml(sp)}</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:2px;">${pctStr}${count} preguntas</div>
-      </div>
-      <div style="font-size:20px;color:var(--muted);">›</div>
-    </button>`;
+  showScreen('biblioteca');
+  showNav();
+  navHighlight('');
+}
+
+function renderBibTabs(){
+  const specs=['__all__',...new Set(allQuestions.map(q=>q.specialty))].sort((a,b)=>a==='__all__'?-1:b==='__all__'?1:a.localeCompare(b));
+  document.getElementById('bib-tabs').innerHTML=specs.map(sp=>{
+    const label=sp==='__all__'?'📋 Todas':specIcon(sp)+' '+sp;
+    const count=sp==='__all__'?allQuestions.length:allQuestions.filter(q=>q.specialty===sp).length;
+    const active=bibCurrentSpec===sp;
+    return `<div class="bib-tab ${active?'active':''}" onclick="bibSelectSpec('${escapeHtml(sp)}')">${label} <span style="opacity:.6;font-size:11px;">${count}</span></div>`;
   }).join('');
-  showScreen('flash-pick');showNav();navHighlight('');
 }
 
-function backToFlashPick(){showScreen('flash-pick');showNav();navHighlight('');}
-
-function startFlashcard(specialty){
-  let pool=specialty?allQuestions.filter(q=>q.specialty===specialty):[...allQuestions];
-  flashQuestions=shuffle(pool);
-  if(flashQuestions.length===0){showToast('⚠️ No hay preguntas en esta categoría');return;}
-  flashIdx=0;renderFlashCard();showScreen('flash');hideNav();
+function bibSelectSpec(sp){
+  bibCurrentSpec=sp;
+  bibSearchQuery='';
+  const searchEl=document.getElementById('bib-search');
+  if(searchEl)searchEl.value='';
+  // Update tab highlight
+  document.querySelectorAll('.bib-tab').forEach(el=>el.classList.remove('active'));
+  const tabs=document.querySelectorAll('.bib-tab');
+  const specs=['__all__',...new Set(allQuestions.map(q=>q.specialty))].sort((a,b)=>a==='__all__'?-1:b==='__all__'?1:a.localeCompare(b));
+  const idx=specs.indexOf(sp);
+  if(tabs[idx])tabs[idx].classList.add('active');
+  // Scroll tab into view
+  if(tabs[idx])tabs[idx].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  renderBibList();
 }
 
-function renderFlashCard(){
-  if(flashIdx>=flashQuestions.length){showToast('🃏 ¡Flashcards completadas!');showNav();openFlashPick();return;}
-  const q=flashQuestions[flashIdx];
-  flashRevealed=false;
-  document.getElementById('flash-spec-tag').textContent=`${specIcon(q.specialty)} ${q.specialty}`;
-  document.getElementById('flash-question').textContent=q.question||'';
-  document.getElementById('flash-reveal').className='flash-reveal';
-  document.getElementById('flash-hint').style.display='block';
-  document.getElementById('flash-actions').style.display='none';
-  document.getElementById('flash-counter').textContent=`${flashIdx+1}/${flashQuestions.length}`;
-  document.getElementById('flash-prog').style.width=`${(flashIdx/flashQuestions.length)*100}%`;
-  document.getElementById('screen-flash').scrollTo(0,0);
+function bibSearch(q){
+  bibSearchQuery=q.toLowerCase();
+  renderBibList();
 }
 
-function revealFlash(){
-  if(flashRevealed)return;
-  flashRevealed=true;
-  const q=flashQuestions[flashIdx];
-  const opts={A:q.opt_a,B:q.opt_b,C:q.opt_c,D:q.opt_d};
-  const ca=q.correct_answer||'A';
-  document.getElementById('flash-answer').textContent=`${ca}: ${opts[ca]||''}`;
-  document.getElementById('flash-explanation').textContent=q.explanation||'';
-  document.getElementById('flash-reveal').className='flash-reveal show';
-  document.getElementById('flash-hint').style.display='none';
-  document.getElementById('flash-actions').style.display='flex';
+function renderBibList(){
+  let pool=bibCurrentSpec==='__all__'?[...allQuestions]:allQuestions.filter(q=>q.specialty===bibCurrentSpec);
+  if(bibSearchQuery){
+    pool=pool.filter(q=>
+      (q.question||'').toLowerCase().includes(bibSearchQuery)||
+      (q.opt_a||'').toLowerCase().includes(bibSearchQuery)||
+      (q.opt_b||'').toLowerCase().includes(bibSearchQuery)||
+      (q.explanation||'').toLowerCase().includes(bibSearchQuery)
+    );
+  }
+
+  document.getElementById('bib-count').textContent=`${pool.length} pregunta${pool.length!==1?'s':''}`;
+
+  if(pool.length===0){
+    document.getElementById('bib-list').innerHTML=`<div class="bib-empty">🔍 Sin resultados para "${escapeHtml(bibSearchQuery)}"</div>`;
+    return;
+  }
+
+  document.getElementById('bib-list').innerHTML=pool.map((q,i)=>{
+    const opts=['A','B','C','D'];
+    const ca=(q.correct_answer||'A').toString().trim().toUpperCase();
+    const prog=progressMap[q.id];
+    const totalAtt=(prog?.correct||0)+(prog?.wrong||0);
+    const mastPct=totalAtt>0?Math.round((prog.correct||0)/totalAtt*100):0;
+    const dominated=isDominated(prog);
+
+    const optsHtml=opts.map(l=>{
+      const txt=q[`opt_${l.toLowerCase()}`]||'';
+      if(!txt.trim())return '';
+      const isCorrect=l===ca;
+      return `<div class="bib-opt ${isCorrect?'is-correct':''}">
+        <div class="bib-opt-letter">${l}</div>
+        <div>${escapeHtml(txt)}</div>
+      </div>`;
+    }).join('');
+
+    const masteryHtml=totalAtt>0?`
+      <div class="bib-mastery">
+        <div class="bib-mastery-bar"><div class="bib-mastery-fill" style="width:${mastPct}%"></div></div>
+        <span class="bib-mastery-lbl">${dominated?'✅ Dominada':`${mastPct}% · ${totalAtt} intentos`}</span>
+      </div>`:'<div style="font-size:11px;color:var(--muted);margin-top:10px;">Sin intentos aún</div>';
+
+    return `<div class="bib-item" id="bib-${q.id}">
+      <div class="bib-item-header" onclick="bibToggle(${q.id})">
+        <div class="bib-num">${i+1}</div>
+        <div class="bib-q">${escapeHtml(q.question||'')}</div>
+        <div class="bib-chevron">›</div>
+      </div>
+      <div class="bib-body">
+        <div style="font-size:11px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">${specIcon(q.specialty)} ${escapeHtml(q.specialty)}</div>
+        <div class="bib-opts">${optsHtml}</div>
+        ${q.explanation?`<div class="bib-explanation">💡 ${escapeHtml(q.explanation)}</div>`:''}
+        ${q.source?`<div class="bib-source">📖 ${escapeHtml(q.source)}</div>`:''}
+        ${masteryHtml}
+      </div>
+    </div>`;
+  }).join('');
 }
 
-async function flashAnswer(knew){
-  const q=flashQuestions[flashIdx];
-  await updateProgress(q.id,knew,progressMap[q.id]?.starred||false);
-  if(!stats[q.specialty])stats[q.specialty]={correct:0,total:0};
-  stats[q.specialty].total++;
-  if(knew){stats[q.specialty].correct++;profile.xp+=5;}
-  profile.lastDate=new Date().toDateString();
-  trackActivity(1);
-  saveLocal();syncToCloud();
-  flashIdx++;
-  renderFlashCard();
+function bibToggle(qId){
+  const el=document.getElementById(`bib-${qId}`);
+  if(!el)return;
+  const wasOpen=el.classList.contains('open');
+  // Cerrar todos los abiertos
+  document.querySelectorAll('.bib-item.open').forEach(e=>e.classList.remove('open'));
+  // Abrir este si estaba cerrado
+  if(!wasOpen){
+    el.classList.add('open');
+    // Smooth scroll to show the item
+    setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+  }
 }
 
 // ══════════════════════════════════════
@@ -1552,8 +1581,9 @@ async function showSimResults(){
   lastExamWrong=answeredList;
 
   const totalAnswered=answeredList.length;
-  const wrong=totalAnswered-correct;
-  const pct=totalAnswered>0?Math.round(correct/totalAnswered*100):0;
+  const totalQuestions=simQuestions.length;
+  const wrong=totalQuestions-correct;  // no respondidas también cuentan como incorrectas
+  const pct=Math.round(correct/totalQuestions*100);
 
   profile.xp+=correct*10;
   profile.lastDate=new Date().toDateString();
@@ -1562,14 +1592,14 @@ async function showSimResults(){
   sessions.unshift({
     date:new Date().toISOString(),
     specialties:[...new Set(simQuestions.map(q=>q.specialty))],
-    score:correct,total:totalAnswered,pct,mode:'simulacro'
+    score:correct,total:totalQuestions,pct,mode:'simulacro'
   });
   if(sessions.length>100)sessions=sessions.slice(0,100);
   saveLocal();syncToCloud();
 
   examScore=correct;examQuestions=simQuestions;lastExamConfig={...simCfg,mode:'sim'};
-  // Pasar wrong y totalAnswered explícitamente para que los contadores sean exactos
-  showResultsScreen(correct,totalAnswered,'Simulacro UNAL',wrong);
+  // Total = preguntas del simulacro, wrong = de las respondidas
+  showResultsScreen(correct,totalQuestions,'Simulacro UNAL',wrong);
   showNav();
 }
 
