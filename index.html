@@ -195,7 +195,8 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);font-s
 
 /* FLASHCARD */
 /* BIBLIOTECA */
-#screen-biblioteca{background:var(--bg);overflow:hidden;padding-bottom:0!important;display:flex;flex-direction:column;}
+#screen-biblioteca{background:var(--bg);overflow:hidden;padding-bottom:0!important;}
+#screen-biblioteca.active{flex-direction:column;}
 #screen-biblioteca .top-bar{flex-shrink:0;}
 .bib-search-wrap{padding:0 20px 10px;flex-shrink:0;}
 .bib-search{width:100%;background:var(--s2);border:1.5px solid var(--border);border-radius:14px;padding:11px 16px;font-size:15px;color:var(--text);font-family:'Sora',sans-serif;outline:none;transition:border-color .15s;-webkit-appearance:none;box-sizing:border-box;}
